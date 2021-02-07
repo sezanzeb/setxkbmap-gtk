@@ -35,6 +35,7 @@ from keymapper.logger import logger
 from keymapper.getdevices import get_devices, is_gamepad
 from keymapper.dev.keycode_mapper import KeycodeMapper
 from keymapper.dev import utils
+from keymapper.xkb import generate_xkb_config, apply_xkb_config
 from keymapper.dev.event_producer import EventProducer
 from keymapper.dev.macros import parse, is_this_a_macro
 from keymapper.state import system_mapping
@@ -153,6 +154,12 @@ class Injector:
 
         self._process = None
         self._msg_pipe = multiprocessing.Pipe()
+
+        if self.mapping.get('generate_xkb_config'):
+            # TODO test
+            generate_xkb_config(self.device, self.mapping)
+            apply_xkb_config(DEV_NAME)
+
         self._key_to_code = self._map_keys_to_codes()
         self._state = UNKNOWN
         self._event_producer = None

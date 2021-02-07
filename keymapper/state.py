@@ -118,6 +118,14 @@ class SystemMapping:
         """Return the code mapped to the key."""
         return self._mapping.get(str(name).lower())
 
+    def get_key(self, code):
+        """Return the key that maps to the provided code."""
+        # TODO test
+        for key in self._mapping:
+            if self._mapping[key] == code:
+                return key
+        return None
+
     def clear(self):
         """Remove all mapped keys. Only needed for tests."""
         keys = list(self._mapping.keys())
