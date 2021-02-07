@@ -34,6 +34,9 @@ workflow:
    2.1 if not in the system_mapping, find a free code
 3. in the symbols file map that code to "b"
 4. the system_mapping gets updated if a free keycode had to be used
+5. the injection proceeds to prepare the remaining stuff using the
+   updated system_mapping. The newly created key-mapper device gets the
+   config files applied using setxkbmap
 
 injection:
 1. running injection sees that "a" was clicked on the keyboard
@@ -75,6 +78,10 @@ def generate_xkb_config(device, mapping):
     #   I don't want to parse them a million times each time the injection
     #   starts
 
+    # TODO describe the problem with mapping shift to e.g. 12 to explain
+    #   why the new config should match the system layout as much as
+    #   possible
+
     symbols = {}
     # TODO test
     for target_code in key_capabilities:
@@ -86,7 +93,7 @@ def generate_xkb_config(device, mapping):
             # this key is not supported by the system layout, for example
             # 'odiaeresis' on an US keyboard. Find a
 
-
+    # TODO if no keycode free anymore, log error and skip the rest
 
 
 
