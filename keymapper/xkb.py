@@ -92,6 +92,7 @@ def generate_xkb_config(device, mapping):
         else:
             # this key is not supported by the system layout, for example
             # 'odiaeresis' on an US keyboard. Find a
+            pass
 
     # TODO if no keycode free anymore, log error and skip the rest
 
@@ -106,3 +107,4 @@ def apply_xkb_config(device):
         Name of the device
     """
     # TODO test
+    pass
