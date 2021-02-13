@@ -76,7 +76,7 @@ def is_numlock_on():
             return num_lock_status[1] == 'on'
 
         return False
-    except subprocess.CalledProcessError:
+    except (FileNotFoundError, subprocess.CalledProcessError):
         # tty
         return None
 
@@ -312,12 +312,17 @@ class Injector:
         input_device : evdev.InputDevice
         gamepad : bool
             if ABS capabilities should be removed in favor of REL
+
+        Returns
+        -------
+        a mapping of int event type to an array of int event codes.
+        Without absinfo.
         """
         ecodes = evdev.ecodes
 
         # copy the capabilities because the uinput is going
         # to act like the device.
-        capabilities = input_device.capabilities(absinfo=False)
+        capabilities = input_device.capabilities(absinfo=True)
 
         if (self._key_to_code or macros) and capabilities.get(EV_KEY) is None:
             capabilities[EV_KEY] = []
@@ -358,11 +363,17 @@ class Injector:
         if ecodes.EV_FF in capabilities:
             del capabilities[ecodes.EV_FF]
         if gamepad and not self._forwards_joystick():
-            # key input to text inputs and such only works without ABS
+            # Key input to text inputs and such only works without ABS
             # events in the capabilities, possibly due to some intentional
             # constraints in wayland/X. So if the joysticks are not used
             # as joysticks remove ABS.
             del capabilities[ecodes.EV_ABS]
+
+        if ecodes.ABS_VOLUME in capabilities.get(ecodes.EV_ABS, []):
+            # For some reason an ABS_VOLUME capability likes to appear
+            # for some users. It prevents mice from moving around and
+            # keyboards from writing characters
+            capabilities[ecodes.EV_ABS].remove(ecodes.ABS_VOLUME)
 
         return capabilities
 
@@ -430,6 +441,11 @@ class Injector:
 
             if len(macros) == 0:
                 logger.debug('No macros configured')
+
+            logger.spam(
+                'Original capabilities for "%s": %s',
+                path, source.capabilities(verbose=True)
+            )
 
             # certain capabilities can have side effects apparently. with an
             # EV_ABS capability, EV_REL won't move the mouse pointer anymore.

@@ -72,6 +72,10 @@ uinput_write_history_pipe = multiprocessing.Pipe()
 pending_events = {}
 
 
+if os.path.exists(tmp):
+    shutil.rmtree(tmp)
+
+
 def read_write_history_pipe():
     """convert the write history from the pipe to some easier to manage list"""
     history = []
@@ -268,6 +272,7 @@ class InputDevice:
         ret = [e.copy() for e in pending_events.get(self.group, [])]
         if ret is not None:
             # consume all of them
+            self.log('read all', self.group)
             pending_events[self.group] = []
 
         return ret
@@ -305,7 +310,7 @@ class InputDevice:
             yield result
             await asyncio.sleep(0.01)
 
-    def capabilities(self, absinfo=True):
+    def capabilities(self, absinfo=True, verbose=False):
         result = copy.deepcopy(fixtures[self.path]['capabilities'])
 
         if absinfo and evdev.ecodes.EV_ABS in result:
@@ -410,19 +415,17 @@ _fixture_copy = copy.deepcopy(fixtures)
 environ_copy = copy.deepcopy(os.environ)
 
 
-def cleanup():
+def quick_cleanup(log=True):
     """Reset the applications state."""
-    print('cleanup')
+    if log:
+        print('quick cleanup')
+
     keycode_reader.stop_reading()
     keycode_reader.__init__()
 
     if asyncio.get_event_loop().is_running():
         for task in asyncio.all_tasks():
             task.cancel()
-
-    os.system('pkill -f key-mapper-service')
-
-    time.sleep(0.05)
 
     if os.path.exists(tmp):
         shutil.rmtree(tmp)
@@ -457,6 +460,20 @@ def cleanup():
     for key in list(os.environ.keys()):
         if key not in environ_copy:
             del os.environ[key]
+
+
+def cleanup():
+    """Reset the applications state.
+
+    Using this is very slow, usually quick_cleanup() is sufficient.
+    """
+    print('cleanup')
+
+    os.system('pkill -f key-mapper-service')
+
+    time.sleep(0.05)
+
+    quick_cleanup(log=False)
 
     refresh_devices()
 

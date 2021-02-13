@@ -25,8 +25,8 @@ import copy
 
 import evdev
 from evdev.ecodes import EV_REL, EV_KEY, EV_ABS, ABS_HAT0X, BTN_LEFT, KEY_A, \
-    REL_X, REL_Y, REL_WHEEL, REL_HWHEEL, BTN_A, ABS_X, ABS_Y, BTN_NORTH,\
-    ABS_Z, ABS_RZ
+    REL_X, REL_Y, REL_WHEEL, REL_HWHEEL, BTN_A, ABS_X, ABS_Y, \
+    ABS_Z, ABS_RZ, ABS_VOLUME
 
 from keymapper.dev.injector import is_numlock_on, set_numlock, \
     ensure_numlock, Injector, is_in_capabilities, \
@@ -41,7 +41,7 @@ from keymapper.getdevices import get_devices, is_gamepad
 
 from tests.test import new_event, pending_events, fixtures, \
     EVENT_READ_TIMEOUT, uinput_write_history_pipe, \
-    MAX_ABS, cleanup, read_write_history_pipe, InputDevice
+    MAX_ABS, quick_cleanup, read_write_history_pipe, InputDevice
 
 
 original_smeab = utils.should_map_event_as_btn
@@ -75,7 +75,7 @@ class TestInjector(unittest.TestCase):
             self.injector = None
         evdev.InputDevice.grab = self.grab
 
-        cleanup()
+        quick_cleanup()
 
     def test_grab(self):
         # path is from the fixtures
@@ -141,8 +141,8 @@ class TestInjector(unittest.TestCase):
             device,
             abs_to_rel
         )
-        self.assertNotIn(evdev.ecodes.EV_ABS, capabilities)
-        self.assertIn(evdev.ecodes.EV_REL, capabilities)
+        self.assertNotIn(EV_ABS, capabilities)
+        self.assertIn(EV_REL, capabilities)
 
         self.assertIn(evdev.ecodes.REL_X, capabilities.get(EV_REL))
         self.assertIn(evdev.ecodes.REL_Y, capabilities.get(EV_REL))
@@ -173,7 +173,7 @@ class TestInjector(unittest.TestCase):
             device,
             gamepad
         )
-        self.assertIn(evdev.ecodes.EV_ABS, capabilities)
+        self.assertIn(EV_ABS, capabilities)
 
     def test_gamepad_purpose_none_2(self):
         # forward abs joystick events for the left joystick only
@@ -194,8 +194,8 @@ class TestInjector(unittest.TestCase):
             device,
             gamepad
         )
-        self.assertIn(evdev.ecodes.EV_ABS, capabilities)
-        self.assertIn(evdev.ecodes.EV_REL, capabilities)
+        self.assertIn(EV_ABS, capabilities)
+        self.assertIn(EV_REL, capabilities)
 
         custom_mapping.change(Key(EV_KEY, BTN_A, 1), 'a')
         device = self.injector._grab_device(path)
@@ -207,9 +207,9 @@ class TestInjector(unittest.TestCase):
             device,
             gamepad
         )
-        self.assertIn(evdev.ecodes.EV_ABS, capabilities)
-        self.assertIn(evdev.ecodes.EV_REL, capabilities)
-        self.assertIn(evdev.ecodes.EV_KEY, capabilities)
+        self.assertIn(EV_ABS, capabilities)
+        self.assertIn(EV_REL, capabilities)
+        self.assertIn(EV_KEY, capabilities)
 
     def test_adds_ev_key(self):
         # for some reason, having any EV_KEY capability is needed to
@@ -420,7 +420,6 @@ class TestInjector(unittest.TestCase):
         # convert the write history to some easier to manage list
         history = read_write_history_pipe()
 
-        print(history)
         self.assertEqual(history.count((EV_KEY, 77, 1)), 1)
         self.assertEqual(history.count((EV_ABS, ABS_RZ, value)), 1)
 
@@ -784,13 +783,26 @@ class TestInjector(unittest.TestCase):
 class TestModifyCapabilities(unittest.TestCase):
     def setUp(self):
         class FakeDevice:
-            def capabilities(self, absinfo=True):
-                assert absinfo is False
-                return {
+            def __init__(self):
+                self._capabilities = {
                     evdev.ecodes.EV_SYN: [1, 2, 3],
                     evdev.ecodes.EV_FF: [1, 2, 3],
-                    evdev.ecodes.EV_ABS: [1, 2, 3]
+                    EV_ABS: [
+                        (1, evdev.AbsInfo(
+                            value=None, min=None, max=1234, fuzz=None,
+                            flat=None, resolution=None
+                        )),
+                        (2, evdev.AbsInfo(
+                            value=None, min=50, max=2345, fuzz=None,
+                            flat=None, resolution=None
+                        )),
+                        3
+                    ]
                 }
+
+            def capabilities(self, absinfo=False):
+                assert absinfo is True
+                return self._capabilities
 
         mapping = Mapping()
         mapping.change(Key(EV_KEY, 80, 1), 'a')
@@ -825,7 +837,7 @@ class TestModifyCapabilities(unittest.TestCase):
         self.assertNotIn(DISABLE_CODE, keys)
 
     def tearDown(self):
-        cleanup()
+        quick_cleanup()
 
     def test_modify_capabilities(self):
         self.injector = Injector('foo', self.mapping)
@@ -844,12 +856,33 @@ class TestModifyCapabilities(unittest.TestCase):
 
         self.assertNotIn(evdev.ecodes.EV_SYN, capabilities)
         self.assertNotIn(evdev.ecodes.EV_FF, capabilities)
-        self.assertNotIn(evdev.ecodes.EV_REL, capabilities)
+        self.assertNotIn(EV_REL, capabilities)
 
         # keeps that stuff since modify_capabilities is told that it is not
         # a gamepad, so it probably serves some special purpose for that
-        # device type.
-        self.assertIn(evdev.ecodes.EV_ABS, capabilities)
+        # device type. For example drawing tablets need that information in
+        # order to move the cursor around. Since it keeps ABS, the AbsInfo
+        # should also be still intact
+        self.assertIn(EV_ABS, capabilities)
+        self.assertEqual(capabilities[EV_ABS][0][1].max, 1234)
+        self.assertEqual(capabilities[EV_ABS][1][1].max, 2345)
+        self.assertEqual(capabilities[EV_ABS][1][1].min, 50)
+        self.assertEqual(capabilities[EV_ABS][2], 3)
+
+    def test_no_abs_volume(self):
+        # I don't know what ABS_VOLUME is, for now I would like to just always
+        # remove it until somebody complains
+        self.injector = Injector('foo', self.mapping)
+        self.fake_device._capabilities = {
+            EV_ABS: [ABS_Y, ABS_VOLUME, ABS_X]
+        }
+
+        capabilities = self.injector._modify_capabilities(
+            {60: self.macro},
+            self.fake_device,
+            gamepad=False
+        )
+        self.assertNotIn(ABS_VOLUME, capabilities[EV_ABS])
 
     def test_modify_capabilities_gamepad(self):
         config.set('gamepad.joystick.left_purpose', MOUSE)

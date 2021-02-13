@@ -30,8 +30,9 @@ requests.
 - [x] mapping joystick directions as buttons, making it act like a D-Pad
 - [x] mapping mouse wheel events to buttons
 - [x] automatically load presets when devices get plugged in after login (udev)
-- [ ] map keys using a `modifier + modifier + ... + key` syntax
+- [x] map keys using a `modifier + modifier + ... + key` syntax
 - [ ] injecting keys that aren't available in the systems keyboard layout
+- [ ] injecting keys while abs capabilities are present. e.g. stylus buttons
 
 ## Tests
 
@@ -44,6 +45,12 @@ coverage combine && coverage report -m
 
 To read events, `evtest` is very helpful. Add `-d` to `key-mapper-gtk`
 to get debug output.
+
+Single tests can be executed via
+
+```bash
+python3 tests/test.py test_paths.TestPaths.test_mkdir
+```
 
 ## Releasing
 
@@ -117,6 +124,6 @@ Communication to the service always happens via `key-mapper-control`
 
 ## Resources
 
-[PyGObject API Reference](https://lazka.github.io/pgi-docs/)
-
-[python-evdev](https://python-evdev.readthedocs.io/en/stable/)
+- [Guidelines for device capabilities](https://www.kernel.org/doc/Documentation/input/event-codes.txt)
+- [PyGObject API Reference](https://lazka.github.io/pgi-docs/)
+- [python-evdev](https://python-evdev.readthedocs.io/en/stable/)
