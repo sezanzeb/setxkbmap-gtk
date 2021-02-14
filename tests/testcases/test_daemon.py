@@ -37,7 +37,7 @@ from keymapper.getdevices import get_devices
 from keymapper.paths import get_preset_path, get_config_path
 from keymapper.key import Key
 from keymapper.mapping import Mapping
-from keymapper.dev.injector import STARTING, RUNNING, STOPPED, UNKNOWN
+from keymapper.injection.injector import STARTING, RUNNING, STOPPED, UNKNOWN
 from keymapper.daemon import Daemon, get_dbus_interface, BUS_NAME, \
     path_to_device_name
 
@@ -353,7 +353,7 @@ class TestDaemon(unittest.TestCase):
         # after passing device and preset, the correct preset is read
         # from the path
         injector = daemon.injectors[device]
-        self.assertEqual(injector.mapping.get_character(Key(3, 2, 1)), 'a')
+        self.assertEqual(injector.context.mapping.get_character(Key(3, 2, 1)), 'a')
 
         # start again
         previous_injector = daemon.injectors[device]
@@ -367,7 +367,7 @@ class TestDaemon(unittest.TestCase):
         self.assertNotEqual(previous_injector, daemon.injectors[device])
         self.assertNotEqual(daemon.injectors[device].get_state(), STOPPED)
         injector = daemon.injectors[device]
-        self.assertEqual(injector.mapping.get_character(Key(3, 2, 1)), 'a')
+        self.assertEqual(injector.context.mapping.get_character(Key(3, 2, 1)), 'a')
 
         # trying to inject a non existing preset keeps the previous inejction
         # alive

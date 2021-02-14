@@ -97,7 +97,6 @@ def generate_xkb_config(device, mapping):
     # TODO if no keycode free anymore, log error and skip the rest
 
 
-
 def apply_xkb_config(device):
     """Call setxkbmap to apply a different xkb keyboard layout to a device.
 
