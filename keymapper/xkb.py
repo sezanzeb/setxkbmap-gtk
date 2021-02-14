@@ -70,41 +70,46 @@ from keymapper.paths import get_preset_path
 from keymapper.state import system_mapping
 
 
-def generate_xkb_config(context, device):
+def generate_xkb_config(context):
     """Generate the needed config file for apply_xkb_config.
 
     Parameters
     ----------
     context : Context
-    device : string
-        Name of the device
 
     Returns
     -------
     string
-        A random path in /tmp/key-mapper/ for the symbols file
+        A random path in /tmp/key-mapper/ for the symbols file. If no
+        new characters that are yet unknown to the system layout are used,
+        it returns None.
     """
     # TODO test
-    # List containing all keycodes that are going to be written by
-    # key-mapper. Keys that are just being forwarded need to be here as well,
+    if len(context.macros) == 0 and len(context.key_to_code) == 0:
+        return None
+
+    # Mapping containing all keycodes that are going to be written by
+    # key-mapper. This also includes those keys that are written by macros.
+    # Keys that are just being forwarded need to be here as well,
     # those can be safely covered by ensuring the system_mapping stays
     # intact. They will be received by the window manager. It is therefore
     # a superset of the system_mapping
-    keycodes = set()
+    injected_mapping = system_mapping.copy_dict()
 
+    # TODO if character not yet in injected_mapping
+    #  for each code->character find a free slot in injected_mapping
+    #  <= 255 and assign the character there
     for macro in context.macros.values():
-        keycodes = keycodes.union(macro.capabilities)
-
-    for code in context.key_to_code.values():
-        keycodes.add(code)
-
+        # TODO output_characters doesn't exist yet
+        for character in macro.output_characters:
+            pass
+    # TODO for character in mapping that is not a macro (is_this_a_macro)
 
     symbols = {}
-    for target_code in keycodes:
-        target_key = system_mapping.get_key(target_code)
-        if target_key is not None:
-            # might be 'KEY_F24', 'odiaeresis' or 'a'
-            symbols[target_code] = target_key.lower().replace('key_', '')
+    for code, character in injected_mapping:
+        # character might be 'KEY_F24', 'odiaeresis' or 'a'
+        if character is not None:
+            symbols[code] = character.lower().replace('key_', '')
         else:
             # this key is not supported by the system layout, for example
             # 'odiaeresis' on an US keyboard. Find a
@@ -112,8 +117,11 @@ def generate_xkb_config(context, device):
 
     # TODO if no keycode free anymore, log error and skip the rest
 
+    # TODO write keycodes into a random path in /tmp/key-mapper/
+    return ''
 
-def apply_xkb_config(device):
+
+def apply_xkb_config(device, path):
     """Call setxkbmap to apply a different xkb keyboard layout to a device.
 
     Parameters
@@ -121,5 +129,10 @@ def apply_xkb_config(device):
     device : string
         Name of the device
     """
+    # TODO does get_devices(include_keymapper=True) return key-mapper devices
+    #   without prior refresh?
+
+    # TODO iterate over all paths to apply the new xkb config
+
     # TODO test
     pass

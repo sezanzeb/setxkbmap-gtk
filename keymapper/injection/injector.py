@@ -99,8 +99,9 @@ class Injector(multiprocessing.Process):
 
         if mapping.get('generate_xkb_config'):
             # TODO test
-            generate_xkb_config(self.context, device, name=device)
-            apply_xkb_config(f'{DEV_NAME} {device}', name=device)
+            symbols = generate_xkb_config(self.context)
+            if symbols is not None:
+                apply_xkb_config(f'{DEV_NAME} {device}', symbols)
 
         self._event_producer = None
         self._state = UNKNOWN
