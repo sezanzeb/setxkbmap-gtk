@@ -887,13 +887,17 @@ Don't hold down any keys while the injection starts.</property>
                         <property name="tooltip-text" translatable="yes">"disable" disables the key outside of combinations.
 Useful for turning a key into a modifier without any side effects.
 
+You can combine buttons by joining them with " + ":
+- control_l + a
+- alt_l + shift_l + i
+
 Macro examples:
 - k(a)
 - r(3, k(a).w(500))
 - h(k(a)).k(b)
 - m(Control_L, k(a).k(x))
 
-Help:
+Macro help:
 - r: repeats the execution of the second parameter
 - w: waits in milliseconds
 - k: writes a single keystroke

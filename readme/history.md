@@ -107,7 +107,7 @@ configurations are needed at all anymore.
 
 # How I would have liked it to be
 
-This solution would have made the macro thing impossible though
+This solution would have made the macro and gamepad thing impossible though
 
 setxkbmap -layout ~/.config/key-mapper/mouse -device 13
 
@@ -122,4 +122,4 @@ done. Without crashing X. Without printing generic useless errors. Without
 colliding with other devices using the same keycodes. Xkb also can't map 282
 afaik. If it was that easy, an app to map keys would have already existed.
 
-The current solution supports a config like that in json format.
+The current solution supports a config somehow similar to that in json format.

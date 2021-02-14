@@ -82,26 +82,29 @@ class Injector(multiprocessing.Process):
     regrab_timeout = 0.5
 
     def __init__(self, device, mapping):
-        """Setup a process to start injecting keycodes based on custom_mapping.
+        """Setup a process to start injecting based on custom_mapping.
+
+        Only construct this class if the mapping is about to be injected,
+        otherwise it will contain outdated information.
 
         Parameters
         ----------
         device : string
-            the name of the device as available in get_device
+            The name of the device as available in get_device
         mapping : Mapping
         """
         self.device = device
 
+        self.context = Context(mapping)
+
         if mapping.get('generate_xkb_config'):
             # TODO test
-            generate_xkb_config(device, mapping)
-            apply_xkb_config(DEV_NAME)
+            generate_xkb_config(self.context, device, name=device)
+            apply_xkb_config(f'{DEV_NAME} {device}', name=device)
 
         self._event_producer = None
         self._state = UNKNOWN
         self._msg_pipe = multiprocessing.Pipe()
-
-        self.context = Context(mapping)
 
         super().__init__()
 

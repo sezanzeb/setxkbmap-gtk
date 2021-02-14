@@ -1,9 +1,15 @@
 // keycodes configuration for key-mapper presets
-// Because the concept of "reasonable symbolic names" [3] doesn't apply
-// when mouse buttons are all over the place. Create an identity mapping
-// to make generating "symbols" files easier. Keycode 10 -> "<10>"
+
+// The concept of "reasonable symbolic names" [3] doesn't apply
+// when mouse buttons are all over the place. Furthermore this file has
+// to work for all devices, which place their keys in different places.
+// So create an identity mapping instead to make generating "symbols" files
+// easier. Keycode 10 -> "<10>"
 // This has the added benefit that keycodes reported by xev can be
 // identified in the symbols file.
+
+// Keycodes reported by evdev are 8 lower than those reported by xev,
+// so 10 in this file means 2 in key-mapper.
 
 default xkb_keycodes "basic" {
     minimum = 8;
