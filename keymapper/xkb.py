@@ -38,10 +38,10 @@ workflow:
        find an integer code that is not present in system_mapping yet.
    2.b if in the system_mapping, use the existing int code.
 3. in the symbols file map that code to "b"
-4. the system_mapping gets updated if a free keycode had to be used
+4. the system_mapping gets updated if a free keycode had to be used  # TODO does it?
 5. the injection proceeds to prepare the remaining stuff using the
-   updated system_mapping. The newly created key-mapper device gets the
-   config files applied using setxkbmap
+   updated system_mapping (key_to_code and macros). The newly created
+   key-mapper device gets the config files applied using setxkbmap
 
 injection:
 1. running injection sees that "a" was clicked on the keyboard
@@ -65,9 +65,64 @@ code that it would usually be.
 """
 
 
+import base64
+import random
+import os
+
 from keymapper.logger import logger
-from keymapper.paths import get_preset_path
+from keymapper.paths import touch
 from keymapper.state import system_mapping
+from keymapper.injection.macros import is_this_a_macro
+
+
+SYMBOLS_TEMPLATE = """xkb_symbols "key-mapper" {
+    include "%s"
+    %s
+};"""
+
+LINE_TEMPLATE = 'key <%d> { [ %s ] };'
+
+
+def random_path():
+    """Generate a random path in tmp."""
+    # TODO test
+    folder = '/tmp/key-mapper'
+    filename = base64.b16encode(random.randbytes(5)).decode()
+    return os.path.join(folder, filename)
+
+
+def find_unknown_mappings(context):
+    """Return a int->string dict for unknown injected codes.
+
+    Mapping containing all keycodes that are going to be written by
+    key-mapper that are not yet part of the system mapping.
+    This also includes those keys that are written by macros.
+    They will be received by the window manager.
+    """
+    # TODO test
+    unknown_mapping = {}
+
+    # character might be 'KEY_F24', 'odiaeresis' or 'a'
+
+    for macro in context.macros.values():
+        # TODO unknown doesn't exist yet
+        for code, character in macro.unknown:
+            unknown_mapping[code] = character
+
+    # TODO for character in mapping that is not a macro (is_this_a_macro)
+    #  update key_to_code if a free slot could be found
+
+    for input_code, character in context.mapping:
+        # input code is what evdev reports for the grabbed device
+        if system_mapping.get(character) is None:
+            if is_this_a_macro(character):
+                continue
+
+            free_output_code = 0  # which code to inject TODO find
+            unknown_mapping[free_output_code] = character
+            context.key_to_code[input_code] = free_output_code
+
+    return unknown_mapping
 
 
 def generate_xkb_config(context):
@@ -88,37 +143,23 @@ def generate_xkb_config(context):
     if len(context.macros) == 0 and len(context.key_to_code) == 0:
         return None
 
-    # Mapping containing all keycodes that are going to be written by
-    # key-mapper. This also includes those keys that are written by macros.
-    # Keys that are just being forwarded need to be here as well,
-    # those can be safely covered by ensuring the system_mapping stays
-    # intact. They will be received by the window manager. It is therefore
-    # a superset of the system_mapping
-    injected_mapping = system_mapping.copy_dict()
+    unknown_mapping = find_unknown_mappings(context)
 
-    # TODO if character not yet in injected_mapping
-    #  for each code->character find a free slot in injected_mapping
-    #  <= 255 and assign the character there
-    for macro in context.macros.values():
-        # TODO output_characters doesn't exist yet
-        for character in macro.output_characters:
-            pass
-    # TODO for character in mapping that is not a macro (is_this_a_macro)
+    symbols = []  # list of 'key <...> {[...]};' strings
+    for code, character in unknown_mapping:
+        symbols.append(LINE_TEMPLATE % (code, character))
 
-    symbols = {}
-    for code, character in injected_mapping:
-        # character might be 'KEY_F24', 'odiaeresis' or 'a'
-        if character is not None:
-            symbols[code] = character.lower().replace('key_', '')
-        else:
-            # this key is not supported by the system layout, for example
-            # 'odiaeresis' on an US keyboard. Find a
-            pass
+    system_mapping_locale = 'de'  # TODO figure out somehow
 
-    # TODO if no keycode free anymore, log error and skip the rest
+    path = random_path()
+    while os.path.exists(path):
+        path = random_path()
 
-    # TODO write keycodes into a random path in /tmp/key-mapper/
-    return ''
+    touch(path)
+    with open(path, 'w') as f:
+        f.write(SYMBOLS_TEMPLATE % (system_mapping_locale, symbols))
+
+    return path
 
 
 def apply_xkb_config(device, path):
@@ -129,10 +170,8 @@ def apply_xkb_config(device, path):
     device : string
         Name of the device
     """
+    # TODO test
     # TODO does get_devices(include_keymapper=True) return key-mapper devices
     #   without prior refresh?
-
     # TODO iterate over all paths to apply the new xkb config
-
-    # TODO test
     pass

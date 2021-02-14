@@ -79,7 +79,6 @@ class _Macro:
             The preset object, needed for some config stuff
         """
         self.tasks = []
-        self.handler = lambda *args: logger.error('No handler set')
         self.code = code
         self.mapping = mapping
 
@@ -188,6 +187,14 @@ class _Macro:
 
         modifier = str(modifier)
         code = system_mapping.get(modifier)
+
+        # TODO if code is None, find free code and hope that xkb.py will
+        #   take care of it? If so, write it down in internal mapping of
+        #   new_code -> output
+        #   Same for k please, maybe a new method for getting the code that
+        #   takes care of that?
+        #   code = self.get_code(modifier)
+        # TODO if no keycode free anymore <= 255, log error
 
         if code is None:
             raise KeyError(f'Unknown modifier "{modifier}"')

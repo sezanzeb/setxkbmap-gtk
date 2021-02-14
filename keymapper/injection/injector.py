@@ -101,6 +101,8 @@ class Injector(multiprocessing.Process):
             # TODO test
             symbols = generate_xkb_config(self.context)
             if symbols is not None:
+                # TODO call this function later because no injection
+                #   device exists yet
                 apply_xkb_config(f'{DEV_NAME} {device}', symbols)
 
         self._event_producer = None

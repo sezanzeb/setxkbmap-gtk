@@ -50,10 +50,6 @@ class SystemMapping:
         """Return an array of all possible names in the mapping."""
         return self._mapping.keys()
 
-    def copy_dict(self):
-        """Return a copy of the internal dictionary."""
-        return self._mapping.copy()
-
     def populate(self):
         """Get a mapping of all available names to their keycodes."""
         logger.debug('Gathering available keycodes')
