@@ -38,7 +38,7 @@ from keymapper.injection.context import Context
 from keymapper.injection.event_producer import EventProducer
 from keymapper.injection.numlock import set_numlock, is_numlock_on, \
     ensure_numlock
-from keymapper.xkb import apply_xkb_config, generate_xkb_config
+from keymapper.injection.xkb import apply_xkb_config, generate_xkb_config
 
 
 DEV_NAME = 'key-mapper'
