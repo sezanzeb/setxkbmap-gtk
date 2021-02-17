@@ -71,8 +71,7 @@ import os
 
 from keymapper.logger import logger
 from keymapper.paths import touch
-from keymapper.state import system_mapping
-from keymapper.injection.macros import is_this_a_macro
+from keymapper.state import system_mapping, XKB_KEYCODE_OFFSET
 
 
 SYMBOLS_TEMPLATE = """xkb_symbols "key-mapper" {
@@ -112,7 +111,7 @@ def generate_xkb_config(context):
 
     symbols = []  # list of 'key <...> {[...]};' strings
     for code, character in system_mapping.get_unknown_mappings().items():
-        symbols.append(LINE_TEMPLATE % (code, character))
+        symbols.append(LINE_TEMPLATE % (code + XKB_KEYCODE_OFFSET, character))
 
     system_mapping_locale = 'de'  # TODO figure out somehow
 
@@ -143,4 +142,5 @@ def apply_xkb_config(context, symbols_path):
     #   without prior refresh?
     # TODO applying it on the mapping device is sufficient. Merge new-dev
     #  into main and main into this
+    # setxkbmap -keycodes /mnt/data/Code/key-mapper/data/keycodes -symbols /tmp/key-mapper/37528A87CD -device 6
     pass

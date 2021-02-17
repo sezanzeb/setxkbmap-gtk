@@ -44,6 +44,12 @@ class SystemMapping:
         """Construct the system_mapping."""
         self._mapping = {}  # str to int
         self._allocated_unknowns = {}  # int to str  # TODO test
+
+        # this may contain more entries than _mapping, since _mapping
+        # stores only one code per character, but a keyboard layout can
+        # have one character mapped to multiple keys.
+        self._occupied_keycodes = set()  # TODO test
+
         self.populate()
 
     def list_names(self):
@@ -61,6 +67,7 @@ class SystemMapping:
                 stderr=subprocess.STDOUT
             ).decode()
             xmodmap = xmodmap.lower()
+            print(xmodmap)
             mappings = re.findall(r'(\d+) = (.+)\n', xmodmap + '\n')
             for keycode, names in mappings:
                 # there might be multiple, like:
@@ -70,7 +77,13 @@ class SystemMapping:
                 # if a modifier is applied at the same time. So take the first
                 # one.
                 name = names.split()[0]
-                xmodmap_dict[name] = int(keycode) - XKB_KEYCODE_OFFSET
+                if name == 'nosymbol':
+                    # TODO test
+                    continue
+
+                keycode = int(keycode) - XKB_KEYCODE_OFFSET
+                xmodmap_dict[name] = keycode
+                self._occupied_keycodes.add(keycode)  # TODO what about loaded mappings of the daemon?
 
             for keycode, names in mappings:
                 # but since KP may be mapped like KP_Home KP_7 KP_Home KP_7,
@@ -79,6 +92,7 @@ class SystemMapping:
                 for name in names.split():
                     if xmodmap_dict.get(name) is None:
                         xmodmap_dict[name] = int(keycode) - XKB_KEYCODE_OFFSET
+
         except (subprocess.CalledProcessError, FileNotFoundError):
             # might be within a tty
             pass
@@ -99,6 +113,8 @@ class SystemMapping:
                 self._set(name, ecode)
 
         self._set(DISABLE_NAME, DISABLE_CODE)
+
+        print(self._occupied_keycodes)
 
     def update(self, mapping):
         """Update this with new keys.
@@ -135,8 +151,6 @@ class SystemMapping:
         Without modifying the keyboard layout of the device injecting the
         returned code won't do anything.
 
-        Returns None if no code could have been allocated
-
         Parameters
         ----------
         character : string
@@ -146,23 +160,29 @@ class SystemMapping:
         character = str(character).lower()
 
         if character in self._mapping:
+            # check if part of the system layout
             return self._mapping[character]
 
         for code, key in self._allocated_unknowns.items():
+            # check if already asked to allocate before
             if key == character:
                 return code
 
         for code in range(256):
-            if code in self._allocated_unknowns:
-                continue
-
-            if self.get_key(code) is not None:
+            # find a free keycode
+            # TODO test that stuff like key_zenkakuhankaku from the linux
+            #  headers are not checked to find free codes. only the xmodmap
+            #  layout is relevant
+            if code in self._occupied_keycodes:
                 continue
 
             self._allocated_unknowns[code] = character
+            logger.debug('Using %s for "%s"', code, character)
             return code
 
-        return None
+        # raise so that it is never forgotten to check for that case
+        # instead of returning None
+        raise Exception('Unknown character and no keycode free')
 
     def clear(self):
         """Remove all mapped keys. Only needed for tests."""
