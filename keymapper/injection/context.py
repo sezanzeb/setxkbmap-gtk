@@ -111,7 +111,7 @@ class Context:
             if is_this_a_macro(output):
                 continue
 
-            target_code = system_mapping.get(output)
+            target_code = system_mapping.get_or_allocate(output)  # TODO test
             if target_code is None:
                 logger.error('Don\'t know what %s is', output)
                 continue

@@ -99,11 +99,11 @@ class Injector(multiprocessing.Process):
 
         if mapping.get('generate_xkb_config'):
             # TODO test
-            symbols = generate_xkb_config(self.context)
-            if symbols is not None:
+            symbols_path = generate_xkb_config(self.context)
+            if symbols_path is not None:
                 # TODO call this function later because no injection
                 #   device exists yet
-                apply_xkb_config(f'{DEV_NAME} {device}', symbols)
+                apply_xkb_config(self.context, symbols_path)
 
         self._event_producer = None
         self._state = UNKNOWN

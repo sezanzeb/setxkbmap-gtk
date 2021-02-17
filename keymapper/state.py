@@ -22,7 +22,6 @@
 """Create some singleton objects that are needed for the app to work."""
 
 
-import stat
 import re
 import json
 import subprocess
@@ -43,7 +42,8 @@ class SystemMapping:
     """Stores information about all available keycodes."""
     def __init__(self):
         """Construct the system_mapping."""
-        self._mapping = {}
+        self._mapping = {}  # str to int
+        self._allocated_unknowns = {}  # int to str  # TODO test
         self.populate()
 
     def list_names(self):
@@ -126,11 +126,59 @@ class SystemMapping:
                 return key
         return None
 
+    def get_or_allocate(self, character):
+        """Get a code to inject for that character.
+
+        If that character does not exist in the systems keyboard layout,
+        remember it and return a free code for that to use.
+
+        Without modifying the keyboard layout of the device injecting the
+        returned code won't do anything.
+
+        Returns None if no code could have been allocated
+
+        Parameters
+        ----------
+        character : string
+            For example F24 or odiaeresis
+        """
+        # TODO test
+        character = str(character).lower()
+
+        if character in self._mapping:
+            return self._mapping[character]
+
+        for code, key in self._allocated_unknowns.items():
+            if key == character:
+                return code
+
+        for code in range(256):
+            if code in self._allocated_unknowns:
+                continue
+
+            if self.get_key(code) is not None:
+                continue
+
+            self._allocated_unknowns[code] = character
+            return code
+
+        return None
+
     def clear(self):
         """Remove all mapped keys. Only needed for tests."""
         keys = list(self._mapping.keys())
         for key in keys:
             del self._mapping[key]
+
+    def get_unknown_mappings(self):
+        """Return a mapping of codes to unknown characters.
+
+        For example, odiaeresis is unknown on US keyboards. The code
+        in that case is just any code that was not used by the systems
+        keyboard layout.
+        """
+        # TODO test
+        return self._allocated_unknowns
 
 
 # one mapping object for the GUI application
@@ -138,6 +186,3 @@ custom_mapping = Mapping()
 
 # this mapping represents the xmodmap output, which stays constant
 system_mapping = SystemMapping()
-
-# permissions for files created in /usr
-_PERMISSIONS = stat.S_IREAD | stat.S_IWRITE | stat.S_IRGRP | stat.S_IROTH

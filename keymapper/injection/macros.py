@@ -186,7 +186,7 @@ class _Macro:
             )
 
         modifier = str(modifier)
-        code = system_mapping.get(modifier)
+        code = system_mapping.get_or_allocate(modifier)  # TODO test
 
         # TODO if code is None, find free code and hope that xkb.py will
         #   take care of it? If so, write it down in internal mapping of
@@ -252,7 +252,7 @@ class _Macro:
     def keycode(self, character):
         """Write the character."""
         character = str(character)
-        code = system_mapping.get(character)
+        code = system_mapping.get_or_allocate(character)  # TODO test
 
         if code is None:
             raise KeyError(f'aUnknown key "{character}"')

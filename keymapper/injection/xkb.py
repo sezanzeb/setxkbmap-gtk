@@ -78,7 +78,8 @@ from keymapper.injection.macros import is_this_a_macro
 SYMBOLS_TEMPLATE = """xkb_symbols "key-mapper" {
     include "%s"
     %s
-};"""
+};
+"""
 
 LINE_TEMPLATE = 'key <%d> { [ %s ] };'
 
@@ -89,40 +90,6 @@ def random_path():
     folder = '/tmp/key-mapper'
     filename = base64.b16encode(random.randbytes(5)).decode()
     return os.path.join(folder, filename)
-
-
-def find_unknown_mappings(context):
-    """Return a int->string dict for unknown injected codes.
-
-    Mapping containing all keycodes that are going to be written by
-    key-mapper that are not yet part of the system mapping.
-    This also includes those keys that are written by macros.
-    They will be received by the window manager.
-    """
-    # TODO test
-    unknown_mapping = {}
-
-    # character might be 'KEY_F24', 'odiaeresis' or 'a'
-
-    for macro in context.macros.values():
-        # TODO unknown doesn't exist yet
-        for code, character in macro.unknown:
-            unknown_mapping[code] = character
-
-    # TODO for character in mapping that is not a macro (is_this_a_macro)
-    #  update key_to_code if a free slot could be found
-
-    for input_code, character in context.mapping:
-        # input code is what evdev reports for the grabbed device
-        if system_mapping.get(character) is None:
-            if is_this_a_macro(character):
-                continue
-
-            free_output_code = 0  # which code to inject TODO find
-            unknown_mapping[free_output_code] = character
-            context.key_to_code[input_code] = free_output_code
-
-    return unknown_mapping
 
 
 def generate_xkb_config(context):
@@ -143,10 +110,8 @@ def generate_xkb_config(context):
     if len(context.macros) == 0 and len(context.key_to_code) == 0:
         return None
 
-    unknown_mapping = find_unknown_mappings(context)
-
     symbols = []  # list of 'key <...> {[...]};' strings
-    for code, character in unknown_mapping:
+    for code, character in system_mapping.get_unknown_mappings().items():
         symbols.append(LINE_TEMPLATE % (code, character))
 
     system_mapping_locale = 'de'  # TODO figure out somehow
@@ -157,21 +122,25 @@ def generate_xkb_config(context):
 
     touch(path)
     with open(path, 'w') as f:
-        f.write(SYMBOLS_TEMPLATE % (system_mapping_locale, symbols))
+        logger.info('Writing xkb symbols "%s"', path)
+        symbols_text = '\n    '.join(symbols)
+        f.write(SYMBOLS_TEMPLATE % (system_mapping_locale, symbols_text))
 
     return path
 
 
-def apply_xkb_config(device, path):
+def apply_xkb_config(context, symbols_path):
     """Call setxkbmap to apply a different xkb keyboard layout to a device.
 
     Parameters
     ----------
-    device : string
-        Name of the device
+    context : Context
+    symbols_path : string
+        Path to a file containing "xkb_symbols"
     """
     # TODO test
     # TODO does get_devices(include_keymapper=True) return key-mapper devices
     #   without prior refresh?
-    # TODO iterate over all paths to apply the new xkb config
+    # TODO applying it on the mapping device is sufficient. Merge new-dev
+    #  into main and main into this
     pass
