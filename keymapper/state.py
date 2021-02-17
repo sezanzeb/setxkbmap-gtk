@@ -67,7 +67,6 @@ class SystemMapping:
                 stderr=subprocess.STDOUT
             ).decode()
             xmodmap = xmodmap.lower()
-            print(xmodmap)
             mappings = re.findall(r'(\d+) = (.+)\n', xmodmap + '\n')
             for keycode, names in mappings:
                 # there might be multiple, like:
@@ -113,8 +112,6 @@ class SystemMapping:
                 self._set(name, ecode)
 
         self._set(DISABLE_NAME, DISABLE_CODE)
-
-        print(self._occupied_keycodes)
 
     def update(self, mapping):
         """Update this with new keys.
