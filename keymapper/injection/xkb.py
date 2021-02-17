@@ -73,9 +73,11 @@ from keymapper.logger import logger
 from keymapper.paths import touch
 from keymapper.state import system_mapping, XKB_KEYCODE_OFFSET
 
+# TODO uppercase f24 -> F24 for symbols file?
 
-SYMBOLS_TEMPLATE = """xkb_symbols "key-mapper" {
+SYMBOLS_TEMPLATE = """default xkb_symbols "basic" {
     include "%s"
+    name[Group1] = "key-mapper";
     %s
 };
 """
