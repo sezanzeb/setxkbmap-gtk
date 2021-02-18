@@ -25,7 +25,8 @@ This is optional and can be disabled via the configuration. If disabled,
 outputting keys that are unknown to the system layout is impossible.
 
 It is optional because broken xkb configs can crash the X session or screw
-up the injection, and in ttys xkb configs don't have any effect.
+up the injection, and in ttys xkb configs don't have any effect. setxkbmap
+is hard to work with, and xkb configs are horrible.
 
 It uses setxkbmap to tell the window manager to do stuff differently for
 the injected keycodes.
@@ -38,10 +39,8 @@ workflow:
        find an integer code that is not present in system_mapping yet.
    2.b if in the system_mapping, use the existing int code.
 3. in the symbols file map that code to "b"
-4. the system_mapping gets updated if a free keycode had to be used  # TODO does it?
-5. the injection proceeds to prepare the remaining stuff using the
-   updated system_mapping (key_to_code and macros). The newly created
-   key-mapper device gets the config files applied using setxkbmap
+4. the "key-mapper ... mapped" uinput is created and the symbols file
+   applied on it
 
 injection:
 1. running injection sees that "a" was clicked on the keyboard
@@ -71,8 +70,6 @@ import time
 from keymapper.logger import logger
 from keymapper.paths import touch
 from keymapper.state import system_mapping, XKB_KEYCODE_OFFSET
-
-# TODO uppercase f24 -> F24 for symbols file?
 
 SYMBOLS_TEMPLATE = """default xkb_symbols "key-mapper" {
     %s
@@ -110,6 +107,7 @@ def generate_xkb_config(context, name):
     for character, code in context.get_all_output_characters().items():
         # TODO resolve that code in xmodmap -pke. if there, insert the
         #  modifications of that character as well
+        # TODO uppercase f24 -> F24 for symbols file?
         symbols.append(LINE_TEMPLATE % (code + XKB_KEYCODE_OFFSET, character))
 
     name = f'key-mapper/{name}'.replace(' ', '_')
