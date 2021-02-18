@@ -65,9 +65,6 @@ code that it would usually be.
 """
 
 
-import base64
-import random
-import os
 import subprocess
 
 from keymapper.logger import logger
@@ -76,9 +73,8 @@ from keymapper.state import system_mapping, XKB_KEYCODE_OFFSET
 
 # TODO uppercase f24 -> F24 for symbols file?
 
-SYMBOLS_TEMPLATE = """default xkb_symbols "basic" {
+SYMBOLS_TEMPLATE = """default xkb_symbols "key-mapper" {
     include "%s"
-    name[Group1] = "key-mapper";
     %s
 };
 """
@@ -86,27 +82,20 @@ SYMBOLS_TEMPLATE = """default xkb_symbols "basic" {
 LINE_TEMPLATE = 'key <%d> { [ %s ] };'
 
 
-def random_path():
-    """Generate a random path in tmp."""
-    # TODO test
-    folder = '/tmp/key-mapper'
-    filename = base64.b16encode(random.randbytes(5)).decode()
-    return os.path.join(folder, filename)
-
-
-def generate_xkb_config(context):
+def generate_xkb_config(context, name):
     """Generate the needed config file for apply_xkb_config.
 
     Parameters
     ----------
     context : Context
+    name : string
+        Used to name the file in /usr/share/X11/xkb/symbols/key-mapper.
+        Existing configs with that name will be overwritten
 
     Returns
     -------
     string
-        A random path in /tmp/key-mapper/ for the symbols file. If no
-        new characters that are yet unknown to the system layout are used,
-        it returns None.
+        A name that can be used for the -symbols argument of setxkbmap
     """
     # TODO test
     if len(context.macros) == 0 and len(context.key_to_code) == 0:
@@ -118,39 +107,54 @@ def generate_xkb_config(context):
 
     system_mapping_locale = 'de'  # TODO figure out somehow
 
-    path = random_path()
-    while os.path.exists(path):
-        path = random_path()
+    name = f'key-mapper/{name}'.replace(' ', '_')
+    path = f'/usr/share/X11/xkb/symbols/{name}'
 
     touch(path)
     with open(path, 'w') as f:
         logger.info('Writing xkb symbols "%s"', path)
-        symbols_text = '\n    '.join(symbols)
-        f.write(SYMBOLS_TEMPLATE % (system_mapping_locale, symbols_text))
+        contents = SYMBOLS_TEMPLATE % (
+            system_mapping_locale,
+            '\n    '.join(symbols)
+        )
+        logger.spam('"%s":\n%s', path, contents.strip())
+        f.write(contents)
 
-    return path
+    return name
 
 
-def apply_xkb_config(context, symbols_path):
+def apply_xkb_config(context, symbols_name):
     """Call setxkbmap to apply a different xkb keyboard layout to a device.
 
     Parameters
     ----------
     context : Context
-    symbols_path : string
-        Path to a file containing "xkb_symbols"
+    symbols_name : string
+        Path of the symbols file relative to /usr/share/X11/xkb/symbols/
     """
     # TODO test
-    # TODO does get_devices(include_keymapper=True) return key-mapper devices
-    #   without prior refresh?
-    # TODO applying it on the mapping device is sufficient. Merge new-dev
-    #  into main and main into this
-    # setxkbmap -keycodes /mnt/data/Code/key-mapper/data/keycodes -symbols /tmp/key-mapper/37528A87CD -device 6
-    # TODO shit this doesn't take paths
-    #  ffs I'll have to put a key-mapper dir into xkb again and for each
-    #  device identifier have at most one file. clear when daemon starts
+    logger.info('Applying xkb configuration')
+    assert ' ' not in symbols_name
 
-    os.system(
-        f'setxkbmap -keycodes /mnt/data/Code/key-mapper/data/keycodes -symbols /tmp/key-mapper/37528A87CD -device 6'
-    )
-    pass
+    device_id = context.uinput.device.path.split('/dev/input/event')[-1]
+
+    try:
+        device_id = int(device_id)
+    except ValueError:
+        logger.error(
+            'Failed to get device_id for "%s": %s',
+            context.uinput.device.path,
+            device_id
+        )
+        return
+
+    # XkbBadKeyboard: wrong -device id
+    cmd = [
+        'setxkbmap',
+        '-keycodes', 'key-mapper-keycodes',
+        '-symbols', symbols_name,
+        '-device', str(device_id)
+    ]
+    logger.debug('Running "%s"', ' '.join(cmd))
+    # TODO disable Popen for setxkbmap in tests
+    subprocess.Popen(cmd)

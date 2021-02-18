@@ -165,8 +165,8 @@ class SystemMapping:
             if key == character:
                 return code
 
-        for code in range(256):
-            # find a free keycode
+        for code in range(1, 256):
+            # find a free keycode in the range of working keycodes
             # TODO test that stuff like key_zenkakuhankaku from the linux
             #  headers are not checked to find free codes. only the xmodmap
             #  layout is relevant
@@ -177,9 +177,7 @@ class SystemMapping:
             logger.debug('Using %s for "%s"', code, character)
             return code
 
-        # raise so that it is never forgotten to check for that case
-        # instead of returning None
-        raise Exception('Unknown character and no keycode free')
+        return None
 
     def clear(self):
         """Remove all mapped keys. Only needed for tests."""

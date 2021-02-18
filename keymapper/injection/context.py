@@ -124,7 +124,7 @@ class Context:
 
             target_code = system_mapping.get_or_allocate(output)  # TODO test
             if target_code is None:
-                logger.error('Don\'t know what %s is', output)
+                logger.error('Could not map unknown key "%s"', output)
                 continue
 
             for permutation in key.get_permutations():

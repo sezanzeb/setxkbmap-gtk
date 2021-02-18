@@ -187,17 +187,8 @@ class _Macro:
 
         modifier = str(modifier)
         code = system_mapping.get_or_allocate(modifier)  # TODO test
-
-        # TODO if code is None, find free code and hope that xkb.py will
-        #   take care of it? If so, write it down in internal mapping of
-        #   new_code -> output
-        #   Same for k please, maybe a new method for getting the code that
-        #   takes care of that?
-        #   code = self.get_code(modifier)
-        # TODO if no keycode free anymore <= 255, log error
-
         if code is None:
-            raise KeyError(f'Unknown modifier "{modifier}"')
+            raise KeyError(f'Could not map unknown modifier "{modifier}"')
 
         self.capabilities.add(code)
 
@@ -253,9 +244,8 @@ class _Macro:
         """Write the character."""
         character = str(character)
         code = system_mapping.get_or_allocate(character)  # TODO test
-
         if code is None:
-            raise KeyError(f'aUnknown key "{character}"')
+            raise KeyError(f'Could not map unknown key "{character}"')
 
         self.capabilities.add(code)
 

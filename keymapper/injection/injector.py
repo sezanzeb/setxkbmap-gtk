@@ -275,6 +275,9 @@ class Injector(multiprocessing.Process):
                 # needed
                 capabilities[EV_KEY].append(ecodes.BTN_MOUSE)
 
+        logger.debug('Constructed capabilities: %s', capabilities)
+        # TODO test that unknown keys are in the capabilities as well
+
         return capabilities
 
     async def _msg_listener(self):
@@ -332,7 +335,7 @@ class Injector(multiprocessing.Process):
 
         if self.context.mapping.get('generate_xkb_config'):
             # TODO test
-            symbols_path = generate_xkb_config(self.context)
+            symbols_path = generate_xkb_config(self.context, self.device)
             if symbols_path is not None:
                 apply_xkb_config(self.context, symbols_path)
 

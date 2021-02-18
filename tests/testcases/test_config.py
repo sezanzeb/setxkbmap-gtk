@@ -161,8 +161,8 @@ class TestConfig(unittest.TestCase):
             f.write('{"a":"b"}')
 
         config.load_config(config_2)
-        self.assertEqual(config.get("a"), "b")
-        self.assertEqual(config.get(["a"]), "b")
+        self.assertEqual(config.get('a'), 'b')
+        self.assertEqual(config.get(['a']), 'b')
 
 
 if __name__ == "__main__":

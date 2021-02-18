@@ -63,15 +63,15 @@ setup(
         ('/usr/share/key-mapper/', glob.glob('data/*')),
         ('/usr/share/applications/', ['data/key-mapper.desktop']),
         ('/usr/share/polkit-1/actions/', ['data/key-mapper.policy']),
-        ('/usr/lib/systemd/system', ['data/key-mapper.service']),
+        ('/usr/share/X11/xkb/keycodes/', ['data/key-mapper-keycodes']),
+        ('/usr/lib/systemd/system/', ['data/key-mapper.service']),
         ('/etc/dbus-1/system.d/', ['data/keymapper.Control.conf']),
         ('/etc/xdg/autostart/', ['data/key-mapper-autoload.desktop']),
-        ('/etc/udev/rules.d', ['data/key-mapper.rules']),
+        ('/etc/udev/rules.d/', ['data/key-mapper.rules']),
         ('/usr/bin/', ['bin/key-mapper-gtk']),
         ('/usr/bin/', ['bin/key-mapper-gtk-pkexec']),
         ('/usr/bin/', ['bin/key-mapper-service']),
         ('/usr/bin/', ['bin/key-mapper-control']),
-        # TODO install key-mapper keycodes to xkb
     ],
     install_requires=[
         'setuptools',

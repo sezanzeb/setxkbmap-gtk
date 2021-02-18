@@ -132,6 +132,8 @@ class _GetDevices(threading.Thread):
 
             if key_capa is None and not gamepad:
                 # skip devices that don't provide buttons that can be mapped
+                # TODO devices with only unknown buttons fail here, because
+                #  the capabilities don't contain those codes
                 continue
 
             if key_capa and len(key_capa) == 1 and key_capa[0] == KEY_CAMERA:
