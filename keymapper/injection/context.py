@@ -147,6 +147,14 @@ class Context:
         """
         return key in self.macros or key in self.key_to_code
 
+    def get_all_output_characters(self):
+        """Return a mapping of name to code for all possible outputs.
+
+        for example name could be "a" and code "30". Includes those
+        mappings that are used within macros, and simple mappings.
+        """
+        # TODO
+
     def forwards_joystick(self):
         """If at least one of the joysticks remains a regular joystick."""
         return NONE in (self.left_purpose, self.right_purpose)

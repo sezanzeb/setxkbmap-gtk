@@ -66,6 +66,7 @@ code that it would usually be.
 
 
 import subprocess
+import time
 
 from keymapper.logger import logger
 from keymapper.paths import touch
@@ -100,14 +101,16 @@ def generate_xkb_config(context, name):
     if len(context.macros) == 0 and len(context.key_to_code) == 0:
         return None
 
-    symbols = []  # list of 'key <...> {[...]};' strings
-    for code, character in system_mapping.get_unknown_mappings().items():
-        symbols.append(LINE_TEMPLATE % (code + XKB_KEYCODE_OFFSET, character))
+    if len(system_mapping.get_unknown_mappings()) == 0:
+        # there is no need to change the layout of the device
+        return None
 
-    # I need to read xmodmap -pke to add all of the modified
-    # versions of the injected characters to the xkb file as well
-    # for character, code in system_mapping._mapping.items():
-    #     symbols.append(LINE_TEMPLATE % (code + XKB_KEYCODE_OFFSET, character))
+    symbols = []  # list of 'key <...> {[...]};' strings
+
+    for character, code in context.get_all_output_characters().items():
+        # TODO resolve that code in xmodmap -pke. if there, insert the
+        #  modifications of that character as well
+        symbols.append(LINE_TEMPLATE % (code + XKB_KEYCODE_OFFSET, character))
 
     name = f'key-mapper/{name}'.replace(' ', '_')
     path = f'/usr/share/X11/xkb/symbols/{name}'
@@ -131,19 +134,28 @@ def apply_xkb_config(context, symbols_name):
     symbols_name : string
         Path of the symbols file relative to /usr/share/X11/xkb/symbols/
     """
+    # needs at least 0.4 seconds for me until the mapping device is visible
+    # in xinput
+    time.sleep(0.4 * 2)
+
     # TODO test
+    # TODO can this stuff even be done from within the daemon?
     logger.info('Applying xkb configuration')
     assert ' ' not in symbols_name
 
-    device_id = context.uinput.device.path.split('/dev/input/event')[-1]
+    device_id = None
 
-    try:
-        device_id = int(device_id)
-    except ValueError:
+    # find the device id. Is there really no better way than parsing stuff?
+    names = subprocess.check_output(['xinput', 'list', '--name-only']).decode().split('\n')
+    ids = subprocess.check_output(['xinput', 'list', '--id-only']).decode().split('\n')
+    for name, id in zip(names, ids):
+        if name == context.uinput.name:
+            device_id = id
+            break
+    else:
         logger.error(
-            'Failed to get device_id for "%s": %s',
-            context.uinput.device.path,
-            device_id
+            'Failed to get device id for "%s"',
+            context.uinput.name
         )
         return
 
