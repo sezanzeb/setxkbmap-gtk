@@ -71,6 +71,7 @@ setup(
         ('/usr/bin/', ['bin/key-mapper-gtk-pkexec']),
         ('/usr/bin/', ['bin/key-mapper-service']),
         ('/usr/bin/', ['bin/key-mapper-control']),
+        # TODO install key-mapper keycodes to xkb
     ],
     install_requires=[
         'setuptools',

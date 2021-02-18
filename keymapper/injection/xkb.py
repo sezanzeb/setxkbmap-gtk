@@ -145,4 +145,7 @@ def apply_xkb_config(context, symbols_path):
     # TODO applying it on the mapping device is sufficient. Merge new-dev
     #  into main and main into this
     # setxkbmap -keycodes /mnt/data/Code/key-mapper/data/keycodes -symbols /tmp/key-mapper/37528A87CD -device 6
+    # TODO shit this doesn't take paths
+    #  ffs I'll have to put a key-mapper dir into xkb again and for each
+    #  device identifier have at most one file. clear when daemon starts
     pass
