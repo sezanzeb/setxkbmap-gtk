@@ -12,7 +12,6 @@
 // so 10 in this file means 2 in key-mapper.
 
 default xkb_keycodes "key-mapper" {
-    include "xfree86(basic)"
     minimum = 8;
     maximum = 255;
     <8> = 8;

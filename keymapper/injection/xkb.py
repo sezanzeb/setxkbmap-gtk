@@ -74,7 +74,6 @@ from keymapper.state import system_mapping, XKB_KEYCODE_OFFSET
 # TODO uppercase f24 -> F24 for symbols file?
 
 SYMBOLS_TEMPLATE = """default xkb_symbols "key-mapper" {
-    include "%s"
     %s
 };
 """
@@ -105,7 +104,10 @@ def generate_xkb_config(context, name):
     for code, character in system_mapping.get_unknown_mappings().items():
         symbols.append(LINE_TEMPLATE % (code + XKB_KEYCODE_OFFSET, character))
 
-    system_mapping_locale = 'de'  # TODO figure out somehow
+    # I need to read xmodmap -pke to add all of the modified
+    # versions of the injected characters to the xkb file as well
+    # for character, code in system_mapping._mapping.items():
+    #     symbols.append(LINE_TEMPLATE % (code + XKB_KEYCODE_OFFSET, character))
 
     name = f'key-mapper/{name}'.replace(' ', '_')
     path = f'/usr/share/X11/xkb/symbols/{name}'
@@ -113,10 +115,7 @@ def generate_xkb_config(context, name):
     touch(path)
     with open(path, 'w') as f:
         logger.info('Writing xkb symbols "%s"', path)
-        contents = SYMBOLS_TEMPLATE % (
-            system_mapping_locale,
-            '\n    '.join(symbols)
-        )
+        contents = SYMBOLS_TEMPLATE % '\n    '.join(symbols)
         logger.spam('"%s":\n%s', path, contents.strip())
         f.write(contents)
 
