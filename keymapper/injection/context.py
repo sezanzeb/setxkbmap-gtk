@@ -154,6 +154,7 @@ class Context:
         mappings that are used within macros, and simple mappings.
         """
         # TODO
+        return {}
 
     def forwards_joystick(self):
         """If at least one of the joysticks remains a regular joystick."""

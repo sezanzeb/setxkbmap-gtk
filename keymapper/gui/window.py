@@ -582,7 +582,8 @@ class Window:
         if state == FAILED:
             self.show_status(
                 CTX_ERROR,
-                f'Failed to apply preset "{self.selected_preset}"'
+                f'Failed to apply preset "{self.selected_preset}"',
+                'See `journalctl -u key-mapper.service | tail` for more info'
             )
             return False
 

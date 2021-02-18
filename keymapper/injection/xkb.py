@@ -102,6 +102,8 @@ def generate_xkb_config(context, name):
         # there is no need to change the layout of the device
         return None
 
+    logger.info('Unknown characters found, creating xkb configs')
+
     symbols = []  # list of 'key <...> {[...]};' strings
 
     for character, code in context.get_all_output_characters().items():
@@ -109,6 +111,9 @@ def generate_xkb_config(context, name):
         #  modifications of that character as well
         # TODO uppercase f24 -> F24 for symbols file?
         symbols.append(LINE_TEMPLATE % (code + XKB_KEYCODE_OFFSET, character))
+
+    # TODO what happens is a key doesn't exist? will the symbols not get
+    #  applied at all?
 
     name = f'key-mapper/{name}'.replace(' ', '_')
     path = f'/usr/share/X11/xkb/symbols/{name}'
@@ -138,23 +143,26 @@ def apply_xkb_config(context, symbols_name):
 
     # TODO test
     # TODO can this stuff even be done from within the daemon?
+    #  no. the client has to do all of that. All of this goes into
+    #  the gui folder. I don't have the context there. have fun
     logger.info('Applying xkb configuration')
     assert ' ' not in symbols_name
 
-    device_id = None
-
     # find the device id. Is there really no better way than parsing stuff?
-    names = subprocess.check_output(['xinput', 'list', '--name-only']).decode().split('\n')
-    ids = subprocess.check_output(['xinput', 'list', '--id-only']).decode().split('\n')
+    try:
+        names = subprocess.check_output(['xinput', 'list', '--name-only']).decode().split('\n')
+        ids = subprocess.check_output(['xinput', 'list', '--id-only']).decode().split('\n')
+    except subprocess.CalledProcessError as error:
+        # systemd services and ttys can't do that
+        logger.error(str(error))
+        return
+
     for name, id in zip(names, ids):
         if name == context.uinput.name:
             device_id = id
             break
     else:
-        logger.error(
-            'Failed to get device id for "%s"',
-            context.uinput.name
-        )
+        logger.error('Failed to get device id for "%s"', context.uinput.name)
         return
 
     # XkbBadKeyboard: wrong -device id
