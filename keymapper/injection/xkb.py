@@ -68,6 +68,7 @@ code that it would usually be.
 import base64
 import random
 import os
+import subprocess
 
 from keymapper.logger import logger
 from keymapper.paths import touch
@@ -148,4 +149,8 @@ def apply_xkb_config(context, symbols_path):
     # TODO shit this doesn't take paths
     #  ffs I'll have to put a key-mapper dir into xkb again and for each
     #  device identifier have at most one file. clear when daemon starts
+
+    os.system(
+        f'setxkbmap -keycodes /mnt/data/Code/key-mapper/data/keycodes -symbols /tmp/key-mapper/37528A87CD -device 6'
+    )
     pass

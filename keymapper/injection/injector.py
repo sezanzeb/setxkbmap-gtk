@@ -97,14 +97,6 @@ class Injector(multiprocessing.Process):
 
         self.context = Context(mapping)
 
-        if mapping.get('generate_xkb_config'):
-            # TODO test
-            symbols_path = generate_xkb_config(self.context)
-            if symbols_path is not None:
-                # TODO call this function later because no injection
-                #   device exists yet
-                apply_xkb_config(self.context, symbols_path)
-
         self._event_producer = None
         self._state = UNKNOWN
         self._msg_pipe = multiprocessing.Pipe()
@@ -337,6 +329,12 @@ class Injector(multiprocessing.Process):
             phys=DEV_NAME,
             events=self._construct_capabilities(group['gamepad'])
         )
+
+        if self.context.mapping.get('generate_xkb_config'):
+            # TODO test
+            symbols_path = generate_xkb_config(self.context)
+            if symbols_path is not None:
+                apply_xkb_config(self.context, symbols_path)
 
         # Watch over each one of the potentially multiple devices per hardware
         for path in group['paths']:
