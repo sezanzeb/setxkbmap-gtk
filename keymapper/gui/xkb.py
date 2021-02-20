@@ -22,6 +22,9 @@
 """Handles calls to setxkbmap. See injection/xkb.py for more info."""
 
 
+# TODO no, move this to the daemon again but set DISPLAY
+
+
 import os
 import subprocess
 import time
