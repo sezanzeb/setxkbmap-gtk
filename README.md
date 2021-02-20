@@ -27,13 +27,14 @@ Get the .deb file from https://github.com/sezanzeb/key-mapper/releases or make i
 sudo apt install git python3-setuptools
 git clone https://github.com/sezanzeb/key-mapper.git
 cd key-mapper; ./scripts/build.sh
-sudo dpkg -i ./dist/key-mapper-0.6.1.deb; sudo apt -f install
+sudo apt install ./dist/key-mapper-0.6.1.deb
 ```
 
 ##### pip
 
 ```bash
 sudo pip install git+https://github.com/sezanzeb/key-mapper.git
+sudo systemctl enable key-mapper
 sudo systemctl restart key-mapper
 ```
 

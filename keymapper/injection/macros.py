@@ -111,6 +111,10 @@ class _Macro:
         handler : function
             Will receive int code and value for an EV_KEY event to write
         """
+        if self.running:
+            logger.error('Tried to run already running macro "%s"', self.code)
+            return
+
         self.running = True
         for _, task in self.tasks:
             coroutine = task(handler)
