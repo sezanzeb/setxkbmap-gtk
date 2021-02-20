@@ -23,7 +23,6 @@
 
 
 import re
-import json
 import subprocess
 import evdev
 
@@ -63,14 +62,6 @@ def xmodmap_to_dict(xmodmap):
         keycode = int(keycode) - XKB_KEYCODE_OFFSET
         xmodmap_dict[name] = keycode
         # TODO what about loaded mappings of the daemon?
-
-    for keycode, names in mappings:
-        # but since a code may be mapped like KP_Home KP_7 KP_Home KP_7,
-        # make another pass and add all of them if they don't already
-        # exist. don't overwrite any keycodes.
-        for name in names.split():
-            if xmodmap_dict.get(name) is None:
-                xmodmap_dict[name] = int(keycode) - XKB_KEYCODE_OFFSET
 
     return xmodmap_dict
 
@@ -115,7 +106,7 @@ class SystemMapping:
                 path = get_config_path(XMODMAP_FILENAME)
                 touch(path)
                 with open(path, 'w') as file:
-                    # TODO Test instead of xmodmap.json just store the xmodmap
+                    # TODO test instead of xmodmap.json just store the xmodmap
                     #  output unmodified, otherwise I can't get the modified
                     #  keys here.
                     logger.debug('Writing "%s"', path)
@@ -187,8 +178,8 @@ class SystemMapping:
 
         for code in range(1, 256):
             # find a free keycode in the range of working keycodes
-            # TODO test that stuff like key_zenkakuhankaku from the linux
-            #  headers are not checked to find free codes. only the xmodmap
+            # TODO test that keys like key_zenkakuhankaku from the linux
+            #  headers are ignored when finding free codes. only the xmodmap
             #  layout is relevant
             if code in self._occupied_keycodes:
                 continue

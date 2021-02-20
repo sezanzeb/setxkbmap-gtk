@@ -540,10 +540,7 @@ class Window:
             'Starting injection...'
         )
 
-        GLib.timeout_add(100, self.show_injection_result)
-
-        # TODO test
-        apply_xkb_config(self.selected_device)
+        GLib.timeout_add(100, self.check_injection_result)
 
     def on_autoload_switch(self, _, active):
         """Load the preset automatically next time the user logs in."""
@@ -579,7 +576,7 @@ class Window:
 
         self.show_device_mapping_status()
 
-    def show_injection_result(self):
+    def check_injection_result(self):
         """Show if the injection was successfully started."""
         state = self.dbus.get_state(self.selected_device)
 
@@ -595,6 +592,9 @@ class Window:
                     CTX_APPLY,
                     f'Applied preset "{self.selected_preset}"'
                 )
+
+            # TODO test
+            apply_xkb_config(self.selected_device)
 
             self.show_device_mapping_status()
             return False

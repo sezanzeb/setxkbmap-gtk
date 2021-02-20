@@ -88,6 +88,38 @@ def get_xkb_symbols_name(device):
     return f'key-mapper/{device}'.replace(' ', '_')
 
 
+def generate_symbols_lines():
+    """Generate lines to put in symbols files.
+
+    Returns
+    -------
+    string[]
+        list of 'key <...> {[...]};' strings
+    """
+    symbols = []
+    xmodmap_path = os.path.join(os.path.dirname(config.path), XMODMAP_FILENAME)
+    if os.path.exists(xmodmap_path):
+        with open(xmodmap_path, 'r') as file:
+            xmodmap = file.read()
+            mappings = re.findall(r'(\d+) = (.+)\n', xmodmap + '\n')
+            for code, names in mappings:
+                symbols.append(LINE_TEMPLATE % (
+                    int(code),
+                    ', '.join(names.split())
+                ))
+    else:
+        logger.error('No xmodmap available to read from')
+        return
+
+    for character, code in system_mapping.get_unknown_mappings().items():
+        symbols.append(LINE_TEMPLATE % (
+            code + XKB_KEYCODE_OFFSET,
+            character
+        ))
+
+    return symbols
+
+
 def generate_xkb_config(context, device):
     """Generate the needed config file for apply_xkb_config.
 
@@ -123,37 +155,11 @@ def generate_xkb_config(context, device):
 
     logger.info('Unknown characters found, creating xkb configs')
 
-    symbols = []  # list of 'key <...> {[...]};' strings
-    # TODO this function is super chaotic
-    # TODO insert the xmodmap into symbols with all of its modifiers
-    xmodmap_path = os.path.join(os.path.dirname(config.path), XMODMAP_FILENAME)
-    if os.path.exists(xmodmap_path):
-        with open(xmodmap_path, 'r') as file:
-            xmodmap = file.read()
-            mappings = re.findall(r'(\d+) = (.+)\n', xmodmap.lower() + '\n')
-            for code, names in mappings:
-                # TODO is names a tuple?
-                symbols.append(LINE_TEMPLATE % (
-                    int(code),
-                    ', '.join(names.split())
-                ))
-    else:
-        logger.error('No xmodmap available to read from')
-        return
-
-    for character, code in system_mapping.get_unknown_mappings().items():
-        # TODO uppercase f24 -> F24 for symbols file?
-        symbols.append(LINE_TEMPLATE % (
-            code + XKB_KEYCODE_OFFSET,
-            ', '.join([character] * 7)
-        ))
+    symbols = generate_symbols_lines()
 
     if len(symbols) == 0:
         logger.error('Failed to populate symbols with anything')
         return
-
-    # TODO what happens if a key doesn't exist? will the symbols not get
-    #  applied at all? e.g. akjegherhqekl
 
     touch(path)
     with open(path, 'w') as f:

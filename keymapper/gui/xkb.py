@@ -58,7 +58,6 @@ def get_device_id(device):
             device_id = id
             break
     else:
-        logger.error('Failed to get device ID for "%s"', mapped_name)
         return None
 
     return device_id
@@ -76,9 +75,17 @@ def apply_xkb_config(device):
     if not custom_mapping.get('generate_xkb_config'):
         return
 
-    # needs at least 0.4 seconds for me until the mapping device is visible
-    # in xinput
-    time.sleep(1)
+    # needs at least 0.2 seconds for me until the mapping device
+    # is visible in xinput
+    for _ in range(5):
+        time.sleep(0.2)
+        device_id = get_device_id(device)
+        if device_id is not None:
+            break
+    else:
+        mapped_name = get_mapping_device_name(device)
+        logger.error('Failed to get device ID for "%s"', mapped_name)
+        return
 
     name = get_xkb_symbols_name(device)
     path = f'/usr/share/X11/xkb/symbols/{name}'
