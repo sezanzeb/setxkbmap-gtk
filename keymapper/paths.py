@@ -131,4 +131,5 @@ def get_preset_path(device=None, preset=None):
 
 def get_config_path(*paths):
     """Get a path in ~/.config/key-mapper/"""
+    # TODO should this ask the config object about its path and dirname it?
     return os.path.join(CONFIG_PATH, *paths)

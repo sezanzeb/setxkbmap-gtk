@@ -35,7 +35,44 @@ from keymapper.paths import get_config_path, touch, USER
 # xkb uses keycodes that are 8 higher than those from evdev
 XKB_KEYCODE_OFFSET = 8
 
-XMODMAP_FILENAME = 'xmodmap.json'
+XMODMAP_FILENAME = 'xmodmap'
+
+
+def xmodmap_to_dict(xmodmap):
+    """Transform the xmodmap to a dict of character to code.
+
+    Parameters
+    ----------
+    xmodmap : str
+        The complete output of `xmodmap -pke`
+    """
+    mappings = re.findall(r'(\d+) = (.+)\n', xmodmap.lower() + '\n')
+    xmodmap_dict = {}
+    for keycode, names in mappings:
+        # there might be multiple, like:
+        # keycode  64 = Alt_L Meta_L Alt_L Meta_L
+        # keycode 204 = NoSymbol Alt_L NoSymbol Alt_L
+        # Alt_L should map to code 64. Writing code 204 only works
+        # if a modifier is applied at the same time.
+        # So take the first one.
+        name = names.split()[0]
+        if name == 'nosymbol':
+            # TODO test
+            continue
+
+        keycode = int(keycode) - XKB_KEYCODE_OFFSET
+        xmodmap_dict[name] = keycode
+        # TODO what about loaded mappings of the daemon?
+
+    for keycode, names in mappings:
+        # but since a code may be mapped like KP_Home KP_7 KP_Home KP_7,
+        # make another pass and add all of them if they don't already
+        # exist. don't overwrite any keycodes.
+        for name in names.split():
+            if xmodmap_dict.get(name) is None:
+                xmodmap_dict[name] = int(keycode) - XKB_KEYCODE_OFFSET
+
+    return xmodmap_dict
 
 
 class SystemMapping:
@@ -66,44 +103,27 @@ class SystemMapping:
                 ['xmodmap', '-pke'],
                 stderr=subprocess.STDOUT
             ).decode()
-            xmodmap = xmodmap.lower()
-            mappings = re.findall(r'(\d+) = (.+)\n', xmodmap + '\n')
-            for keycode, names in mappings:
-                # there might be multiple, like:
-                # keycode  64 = Alt_L Meta_L Alt_L Meta_L
-                # keycode 204 = NoSymbol Alt_L NoSymbol Alt_L
-                # Alt_L should map to code 64. Writing code 204 only works
-                # if a modifier is applied at the same time. So take the first
-                # one.
-                name = names.split()[0]
-                if name == 'nosymbol':
-                    # TODO test
-                    continue
 
-                keycode = int(keycode) - XKB_KEYCODE_OFFSET
-                xmodmap_dict[name] = keycode
-                self._occupied_keycodes.add(keycode)  # TODO what about loaded mappings of the daemon?
+            xmodmap_dict = xmodmap_to_dict(xmodmap)
+            for keycode in xmodmap_dict.values():
+                self._occupied_keycodes.add(keycode)
 
-            for keycode, names in mappings:
-                # but since KP may be mapped like KP_Home KP_7 KP_Home KP_7,
-                # make another pass and add all of them if they don't already
-                # exist. don't overwrite any keycodes.
-                for name in names.split():
-                    if xmodmap_dict.get(name) is None:
-                        xmodmap_dict[name] = int(keycode) - XKB_KEYCODE_OFFSET
+            if USER != 'root':
+                # write this stuff into the key-mapper config directory,
+                # because the systemd service won't know the user sessions
+                # xmodmap
+                path = get_config_path(XMODMAP_FILENAME)
+                touch(path)
+                with open(path, 'w') as file:
+                    # TODO Test instead of xmodmap.json just store the xmodmap
+                    #  output unmodified, otherwise I can't get the modified
+                    #  keys here.
+                    logger.debug('Writing "%s"', path)
+                    file.write(xmodmap)
 
         except (subprocess.CalledProcessError, FileNotFoundError):
             # might be within a tty
             pass
-
-        if USER != 'root':
-            # write this stuff into the key-mapper config directory, because
-            # the systemd service won't know the user sessions xmodmap
-            path = get_config_path(XMODMAP_FILENAME)
-            touch(path)
-            with open(path, 'w') as file:
-                logger.debug('Writing "%s"', path)
-                json.dump(xmodmap_dict, file, indent=4)
 
         self._mapping.update(xmodmap_dict)
 
@@ -160,7 +180,7 @@ class SystemMapping:
             # check if part of the system layout
             return self._mapping[character]
 
-        for code, key in self._allocated_unknowns.items():
+        for key, code in self._allocated_unknowns.items():
             # check if already asked to allocate before
             if key == character:
                 return code
@@ -173,7 +193,7 @@ class SystemMapping:
             if code in self._occupied_keycodes:
                 continue
 
-            self._allocated_unknowns[code] = character
+            self._allocated_unknowns[character] = code
             logger.debug('Using %s for "%s"', code, character)
             return code
 
@@ -186,7 +206,7 @@ class SystemMapping:
             del self._mapping[key]
 
     def get_unknown_mappings(self):
-        """Return a mapping of codes to unknown characters.
+        """Return a mapping of unknown characters to codes.
 
         For example, odiaeresis is unknown on US keyboards. The code
         in that case is just any code that was not used by the systems

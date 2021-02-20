@@ -35,6 +35,7 @@ from keymapper.logger import logger
 from keymapper.getdevices import get_devices
 from keymapper.gui.row import Row, to_string
 from keymapper.gui.reader import keycode_reader
+from keymapper.gui.xkb import apply_xkb_config
 from keymapper.injection.injector import RUNNING, FAILED, NO_GRAB
 from keymapper.daemon import get_dbus_interface
 from keymapper.config import config
@@ -540,6 +541,9 @@ class Window:
         )
 
         GLib.timeout_add(100, self.show_injection_result)
+
+        # TODO test
+        apply_xkb_config(self.selected_device)
 
     def on_autoload_switch(self, _, active):
         """Load the preset automatically next time the user logs in."""

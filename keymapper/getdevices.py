@@ -53,6 +53,11 @@ if not hasattr(evdev.InputDevice, 'path'):
     evdev.InputDevice.path = path
 
 
+def get_mapping_device_name(device):
+    """Transform "abc" to "key-mapper abc mapped"."""
+    return f'key-mapper {device} mapped'
+
+
 def is_gamepad(device):
     """Check if joystick movements are available for mapping.
 

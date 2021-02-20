@@ -30,7 +30,8 @@ import evdev
 from evdev.ecodes import EV_KEY, EV_REL
 
 from keymapper.logger import logger
-from keymapper.getdevices import get_devices, is_gamepad
+from keymapper.getdevices import get_devices, is_gamepad, \
+    get_mapping_device_name
 from keymapper import utils
 from keymapper.mapping import DISABLE_CODE
 from keymapper.injection.keycode_mapper import KeycodeMapper
@@ -38,7 +39,7 @@ from keymapper.injection.context import Context
 from keymapper.injection.event_producer import EventProducer
 from keymapper.injection.numlock import set_numlock, is_numlock_on, \
     ensure_numlock
-from keymapper.injection.xkb import apply_xkb_config, generate_xkb_config
+from keymapper.injection.xkb import generate_xkb_config
 
 
 DEV_NAME = 'key-mapper'
@@ -330,16 +331,12 @@ class Injector(multiprocessing.Process):
         # where mapped events go to.
         # See the Context docstring on why this is needed.
         self.context.uinput = evdev.UInput(
-            name=f'{DEV_NAME} {self.device} mapped',
+            name=get_mapping_device_name(self.device),
             phys=DEV_NAME,
             events=self._construct_capabilities(group['gamepad'])
         )
 
-        if self.context.mapping.get('generate_xkb_config'):
-            # TODO test
-            symbols_path = generate_xkb_config(self.context, self.device)
-            if symbols_path is not None:
-                apply_xkb_config(self.context, symbols_path)
+        generate_xkb_config(self.context, self.device)  # TODO test
 
         # Watch over each one of the potentially multiple devices per hardware
         for path in group['paths']:

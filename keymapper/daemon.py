@@ -38,7 +38,7 @@ from keymapper.logger import logger
 from keymapper.injection.injector import Injector, UNKNOWN
 from keymapper.mapping import Mapping
 from keymapper.config import config
-from keymapper.state import system_mapping
+from keymapper.state import system_mapping, XMODMAP_FILENAME, xmodmap_to_dict
 from keymapper.getdevices import get_devices, refresh_devices
 
 
@@ -428,14 +428,13 @@ class Daemon:
         # readable keys in the correct keyboard layout to the service.
         # The service cannot use `xmodmap -pke` because it's running via
         # systemd.
-        xmodmap_path = os.path.join(self.config_dir, 'xmodmap.json')
+        xmodmap_path = os.path.join(self.config_dir, XMODMAP_FILENAME)
         try:
             with open(xmodmap_path, 'r') as file:
                 # do this for each injection to make sure it is up to
                 # date when the system layout changes.
-                xmodmap = json.load(file)
                 logger.debug('Using keycodes from "%s"', xmodmap_path)
-                system_mapping.update(xmodmap)
+                system_mapping.update(xmodmap_to_dict(file.read()))
                 # the service now has process wide knowledge of xmodmap
                 # keys of the users session
         except FileNotFoundError:
