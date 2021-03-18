@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # key-mapper - GUI for device specific keyboard mappings
-# Copyright (C) 2021 sezanzeb <proxima@hip70890b.de>
+# Copyright (C) 2021 sezanzeb <proxima@sezanzeb.de>
 #
 # This file is part of key-mapper.
 #
@@ -77,8 +77,8 @@ def get_dbus_interface(fallback=True):
         logger.warning(msg)
         return Daemon()
 
-    bus = SystemBus()
     try:
+        bus = SystemBus()
         interface = bus.get(BUS_NAME)
     except GLib.GError as error:
         logger.debug(error)

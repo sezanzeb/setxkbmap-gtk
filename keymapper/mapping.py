@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # key-mapper - GUI for device specific keyboard mappings
-# Copyright (C) 2021 sezanzeb <proxima@hip70890b.de>
+# Copyright (C) 2021 sezanzeb <proxima@sezanzeb.de>
 #
 # This file is part of key-mapper.
 #
@@ -115,10 +115,8 @@ class Mapping(ConfigBase):
         if character is None:
             raise ValueError('Expected `character` not to be None')
 
-        logger.debug(
-            '%s will map to "%s"',
-            new_key, character
-        )
+        character = character.strip()
+        logger.debug('%s will map to "%s"', new_key, character)
         self.clear(new_key)  # this also clears all equivalent keys
         self._mapping[new_key] = character
 

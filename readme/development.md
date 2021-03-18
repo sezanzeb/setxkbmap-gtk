@@ -1,7 +1,8 @@
 # Development
 
 Contributions are very welcome, I will gladly review and discuss any merge
-requests.
+requests. This file should give an overview about some notable internals of
+key-mapper.
 
 ## Roadmap
 
@@ -31,8 +32,9 @@ requests.
 - [x] mapping mouse wheel events to buttons
 - [x] automatically load presets when devices get plugged in after login (udev)
 - [x] map keys using a `modifier + modifier + ... + key` syntax
-- [ ] injecting keys that aren't available in the systems keyboard layout
 - [x] inject in an additional device instead to avoid clashing capabilities
+- [ ] don't run any GTK code as root for wayland compatibility
+- [ ] injecting keys that aren't available in the systems keyboard layout
 - [ ] ship with a list of all keys known to xkb and validate input in the gui
 
 ## Tests
@@ -61,7 +63,7 @@ ssh/login into a debian/ubuntu environment
 ./scripts/build.sh
 ```
 
-This will generate `key-mapper/deb/key-mapper-0.6.1.deb`
+This will generate `key-mapper/deb/key-mapper-0.7.0.deb`
 
 ## Badges
 
@@ -146,6 +148,18 @@ readme/capabilities.md
 **It won't offer mapping a button**
 
 Modify `should_map_as_btn`
+
+## How it works
+
+It uses evdev
+
+1. It grabs a device (e.g. /dev/input/event3), so that the key events won't reach X11/Wayland anymore [source](https://github.com/sezanzeb/key-mapper/blob/0.7.0/keymapper/injection/injector.py#L182)
+2. Reads the events from it (`evtest` can do it, you can also do `cat /dev/input/event3` which yields binary stuff) [source](https://github.com/sezanzeb/key-mapper/blob/0.7.0/keymapper/injection/injector.py#L413)
+3. Looks up the mapping if that event maps to anything [source](https://github.com/sezanzeb/key-mapper/blob/0.7.0/keymapper/injection/keycode_mapper.py#L421)
+4. Injects the output event in a new device that key-mapper created (another new path in /dev/input, device name is suffixed by "mapped") [source](https://github.com/sezanzeb/key-mapper/blob/0.7.0/keymapper/injection/keycode_mapper.py#L227), [new device](https://github.com/sezanzeb/key-mapper/blob/0.7.0/keymapper/injection/injector.py#L324)
+5. Forwards any events that should not be mapped to anything in another new device (device name is suffixed by "forwarded") [source](https://github.com/sezanzeb/key-mapper/blob/0.7.0/keymapper/injection/keycode_mapper.py#L232), [new device](https://github.com/sezanzeb/key-mapper/blob/0.7.0/keymapper/injection/injector.py#L342)
+
+This stuff is going on as a daemon in the background
 
 ## Resources
 

@@ -21,13 +21,14 @@ pacaur -S key-mapper-git
 
 ##### Ubuntu/Debian
 
-Get the .deb file from https://github.com/sezanzeb/key-mapper/releases or make it yourself:
+Get a .deb file from the [release page](https://github.com/sezanzeb/key-mapper/releases)
+or install the latest changes via:
 
 ```bash
 sudo apt install git python3-setuptools
 git clone https://github.com/sezanzeb/key-mapper.git
 cd key-mapper; ./scripts/build.sh
-sudo apt install ./dist/key-mapper-0.6.1.deb
+sudo apt install ./dist/key-mapper-0.7.0.deb
 ```
 
 ##### pip
@@ -37,9 +38,6 @@ sudo pip install git+https://github.com/sezanzeb/key-mapper.git
 sudo systemctl enable key-mapper
 sudo systemctl restart key-mapper
 ```
-
-You can also try `sudo python3 setup.py install`, but that is not
-recommended to do.
 
 ## Screenshots
 

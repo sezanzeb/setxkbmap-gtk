@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # key-mapper - GUI for device specific keyboard mappings
-# Copyright (C) 2021 sezanzeb <proxima@hip70890b.de>
+# Copyright (C) 2021 sezanzeb <proxima@sezanzeb.de>
 #
 # This file is part of key-mapper.
 #
@@ -101,7 +101,8 @@ class Injector(multiprocessing.Process):
         self._event_producer = None
         self._state = UNKNOWN
         self._msg_pipe = multiprocessing.Pipe()
-
+        self.mapping = mapping
+        self.context = None  # only needed inside the injection process
         super().__init__()
 
     """Functions to interact with the running process"""
@@ -322,6 +323,10 @@ class Injector(multiprocessing.Process):
         # device.
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
+
+        # create this within the process after the event loop creation,
+        # so that the macros use the correct loop
+        self.context = Context(self.mapping)
 
         self._event_producer = EventProducer(self.context)
 

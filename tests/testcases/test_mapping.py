@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # key-mapper - GUI for device specific keyboard mappings
-# Copyright (C) 2021 sezanzeb <proxima@hip70890b.de>
+# Copyright (C) 2021 sezanzeb <proxima@sezanzeb.de>
 #
 # This file is part of key-mapper.
 #
@@ -138,7 +138,7 @@ class TestMapping(unittest.TestCase):
 
         # setting mapping.whatever does not overwrite the mapping
         # after saving. It should be ignored.
-        self.mapping.change(Key(EV_KEY, 81, 1), 'a')
+        self.mapping.change(Key(EV_KEY, 81, 1), ' a ')
         self.mapping.set('mapping.a', 2)
         self.assertEqual(self.mapping.num_saved_keys, 0)
         self.mapping.save(get_preset_path('foo', 'bar'))
@@ -167,9 +167,9 @@ class TestMapping(unittest.TestCase):
         ev_2 = Key(EV_KEY, 2, 0)
 
         mapping1 = Mapping()
-        mapping1.change(ev_1, 'a')
+        mapping1.change(ev_1, ' a')
         mapping2 = mapping1.clone()
-        mapping1.change(ev_2, 'b')
+        mapping1.change(ev_2, 'b ')
 
         self.assertEqual(mapping1.get_character(ev_1), 'a')
         self.assertEqual(mapping1.get_character(ev_2), 'b')

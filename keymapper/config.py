@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # key-mapper - GUI for device specific keyboard mappings
-# Copyright (C) 2021 sezanzeb <proxima@hip70890b.de>
+# Copyright (C) 2021 sezanzeb <proxima@sezanzeb.de>
 #
 # This file is part of key-mapper.
 #
@@ -206,7 +206,7 @@ class GlobalConfig(ConfigBase):
             self.set(['autoload', device], preset)
         else:
             logger.info(
-                'Not loading injecting for "%s" automatically anmore',
+                'Not injecting for "%s" automatically anmore',
                 device
             )
             self.remove(['autoload', device])
