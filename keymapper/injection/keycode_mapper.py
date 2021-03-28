@@ -141,7 +141,7 @@ class Unreleased:
         That means the release event should also be injected into that one.
         If this returns false, just forward the release event instead.
         """
-        # This should end up being equal to context.is_mapped(key)
+        # This should end up being equal to context.is_input_mapped(key)
         return self.triggered_key is not None
 
     def __str__(self):
@@ -301,7 +301,7 @@ class KeycodeMapper:
                     # the newest input are of interest
                     continue
 
-                if self.context.is_mapped(subset):
+                if self.context.is_input_mapped(subset):
                     key = subset
                     break
             else:
@@ -347,7 +347,7 @@ class KeycodeMapper:
         active_macro = active_macros.get(type_code)
 
         key = self._get_key(event_tuple)
-        is_mapped = self.context.is_mapped(key)
+        is_mapped = self.context.is_input_mapped(key)
 
         """Releasing keys and macros"""
 

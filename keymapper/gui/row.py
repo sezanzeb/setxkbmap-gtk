@@ -29,6 +29,7 @@ from keymapper.state import custom_mapping, system_mapping
 from keymapper.logger import logger
 from keymapper.key import Key
 from keymapper.gui.reader import reader
+from keymapper.valid_symbols import VALID_XKB_SYMBOLS
 
 
 CTX_KEYCODE = 2
@@ -39,7 +40,7 @@ store = Gtk.ListStore(str)
 
 def populate_store():
     """Fill the dropdown for key suggestions with values."""
-    for name in system_mapping.list_names():
+    for name in VALID_XKB_SYMBOLS:
         store.append([name])
 
     extra = [

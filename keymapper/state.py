@@ -29,7 +29,7 @@ import evdev
 from keymapper.logger import logger
 from keymapper.mapping import Mapping, DISABLE_NAME, DISABLE_CODE
 from keymapper.paths import get_config_path, touch, USER
-from keymapper.injection.valid_symbols import VALID_XKB_SYMBOLS
+from keymapper.valid_symbols import VALID_XKB_SYMBOLS
 
 
 # xkb uses keycodes that are 8 higher than those from evdev
@@ -44,11 +44,12 @@ def xmodmap_to_dict(xmodmap):
     Parameters
     ----------
     xmodmap : str
-        The complete output of `xmodmap -pke`
+        The complete output of `xmodmap -pke`, but with keycodes
+        reduced by XKB_KEYCODE_OFFSET already
     """
     mappings = re.findall(r'(\d+) = (.+)\n', xmodmap.lower() + '\n')
     xmodmap_dict = {}
-    for keycode, names in mappings:
+    for x_code, names in mappings:
         # there might be multiple, like:
         # keycode  64 = Alt_L Meta_L Alt_L Meta_L
         # keycode 204 = NoSymbol Alt_L NoSymbol Alt_L
@@ -60,17 +61,9 @@ def xmodmap_to_dict(xmodmap):
             # TODO test
             continue
 
-        keycode = int(keycode) - XKB_KEYCODE_OFFSET
-        xmodmap_dict[name] = keycode
+        if xmodmap_dict.get(name) is None:
+            xmodmap_dict[name] = int(x_code) - XKB_KEYCODE_OFFSET
         # TODO what about loaded mappings of the daemon?
-
-    for keycode, names in mappings:
-        # but since KP may be mapped like KP_Home KP_7 KP_Home KP_7,
-        # make another pass and add all of them if they don't already
-        # exist. don't overwrite any keycodes.
-        for name in names.split():
-            if xmodmap_dict.get(name) is None:
-                xmodmap_dict[name] = int(keycode) - XKB_KEYCODE_OFFSET
 
     return xmodmap_dict
 
@@ -121,7 +114,7 @@ class SystemMapping:
             with open(path, 'w') as file:
                 # TODO test instead of xmodmap.json it just stores the
                 #  xmodmap output unmodified, otherwise I can't get the
-                #  modified keys here.
+                #  modified keys in generate_symbols_lines.
                 logger.debug('Writing "%s"', path)
                 file.write(xmodmap)
 
@@ -167,8 +160,8 @@ class SystemMapping:
         If that character does not exist in the systems keyboard layout,
         remember it and return a free code for that to use.
 
-        Without modifying the keyboard layout of the device injecting the
-        returned code won't do anything.
+        Without modifying the keyboard layout of the display server
+        injecting the returned code won't do anything.
 
         Parameters
         ----------
@@ -185,13 +178,11 @@ class SystemMapping:
             # check if part of the system layout
             return self._mapping[character]
 
-        # it's unknown, allocate instead
-        # TODO test if it is known to xkb at all
-        #  generate a list from the contents of the xkb dir?
         if character not in VALID_XKB_SYMBOLS:
             # not something xkb can do stuff with
             return None
 
+        # it's not part of the systems keyboard layout yet, allocate instead
         for key, code in self._allocated_unknowns.items():
             # check if already asked to allocate before
             if key == character:
@@ -206,6 +197,7 @@ class SystemMapping:
                 continue
 
             self._allocated_unknowns[character] = code
+            self._occupied_keycodes.add(code)  # TODO test that added
             logger.debug('Using %s for "%s"', code, character)
             return code
 
@@ -234,6 +226,15 @@ class SystemMapping:
                 return item[0]
 
         return None
+
+
+def is_symbol(character):
+    """Check if the character is known to xkb or linux."""
+    # TODO test
+    if character in VALID_XKB_SYMBOLS:
+        return True
+
+    return character in evdev.ecodes.ecodes.keys()
 
 
 # one mapping object for the GUI application

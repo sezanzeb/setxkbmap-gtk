@@ -58,20 +58,20 @@ class TestContext(unittest.TestCase):
         self.assertEqual(self.context.key_to_code[(1, 34, 1), (1, 33, 1), (1, 35, 1)], c)
 
     def test_is_mapped(self):
-        self.assertTrue(self.context.is_mapped(
+        self.assertTrue(self.context.is_input_mapped(
             ((1, 32, 1),)
         ))
-        self.assertTrue(self.context.is_mapped(
+        self.assertTrue(self.context.is_input_mapped(
             ((1, 33, 1), (1, 34, 1), (1, 35, 1))
         ))
-        self.assertTrue(self.context.is_mapped(
+        self.assertTrue(self.context.is_input_mapped(
             ((1, 34, 1), (1, 33, 1), (1, 35, 1))
         ))
 
-        self.assertFalse(self.context.is_mapped(
+        self.assertFalse(self.context.is_input_mapped(
             ((1, 34, 1), (1, 35, 1), (1, 33, 1))
         ))
-        self.assertFalse(self.context.is_mapped(
+        self.assertFalse(self.context.is_input_mapped(
             ((1, 36, 1),)
         ))
 

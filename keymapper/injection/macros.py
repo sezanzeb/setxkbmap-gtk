@@ -83,7 +83,8 @@ class _Macro:
 
         self.running = False
 
-        # all required capabilities, without those of child macros
+        # all required capabilities for a new UInput, i.e. all event codes
+        # that will be written by the macro, without those of child macros
         self.capabilities = {
             EV_KEY: set(),
             EV_REL: set(),

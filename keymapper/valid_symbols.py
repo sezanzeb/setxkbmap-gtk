@@ -19,7 +19,7 @@
 # along with key-mapper.  If not, see <https://www.gnu.org/licenses/>.
 
 
-"""A list of all human readable symbols xkb understands."""
+"""A set of all human readable symbols xkb understands."""
 
 # https://gist.github.com/sezanzeb/1236917f509f13d30010c98c9fa8389f
 VALID_XKB_SYMBOLS = {

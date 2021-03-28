@@ -22,6 +22,8 @@
 """Stores injection-process wide information."""
 
 
+from evdev.ecodes import EV_KEY
+
 from keymapper.logger import logger
 from keymapper.injection.macros import parse, is_this_a_macro
 from keymapper.state import system_mapping
@@ -47,8 +49,8 @@ class Context:
     Members
     -------
     mapping : Mapping
-        The mapping that is the source of key_to_code and macros,
-        only used to query config values.
+        Also known as custom_mapping.
+        The mapping that is going to be applied on the device.
     key_to_code : dict
         Mapping of ((type, code, value),) to linux-keycode
         or multiple of those like ((...), (...), ...) for combinations.
@@ -137,15 +139,28 @@ class Context:
 
         return key_to_code
 
-    def is_mapped(self, key):
-        """Check if this key is used for macros or mappings.
+    def is_input_mapped(self, key):
+        """Check if this input key is used for macros or mappings.
 
         Parameters
         ----------
         key : ((int, int, int),)
-            One or more 3-tuples of type, code, value
+            One or more 3-tuples of type, code, value.
+            Originates from the original unmapped device
         """
         return key in self.macros or key in self.key_to_code
+
+    def is_written(self, code):
+        """Check if this code will be written during the injection."""
+        # TODO test
+        if code in self.key_to_code.values():
+            return True
+
+        for macro in self.macros:
+            if code in macro.capabilities[EV_KEY]:
+                return True
+
+        return False
 
     def forwards_joystick(self):
         """If at least one of the joysticks remains a regular joystick."""

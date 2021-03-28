@@ -66,13 +66,10 @@ code that it would usually be.
 
 
 import os
-import re
 
 from keymapper.logger import logger
 from keymapper.paths import touch
-from keymapper.state import system_mapping, XKB_KEYCODE_OFFSET, \
-    XMODMAP_FILENAME
-from keymapper.config import config
+from keymapper.state import system_mapping, XKB_KEYCODE_OFFSET
 
 
 SYMBOLS_TEMPLATE = """default xkb_symbols "key-mapper" {
@@ -88,7 +85,7 @@ def get_xkb_symbols_name(device):
     return f'key-mapper/{device}'.replace(' ', '_')
 
 
-def generate_symbols_lines():
+def generate_symbols_lines(context):
     """Generate lines to put in symbols files.
 
     Returns
@@ -97,25 +94,37 @@ def generate_symbols_lines():
         list of 'key <...> {[...]};' strings
     """
     symbols = []
-    xmodmap_path = os.path.join(os.path.dirname(config.path), XMODMAP_FILENAME)
-    if os.path.exists(xmodmap_path):
-        with open(xmodmap_path, 'r') as file:
-            xmodmap = file.read()
-            mappings = re.findall(r'(\d+) = (.+)\n', xmodmap + '\n')
-            for code, names in mappings:
-                symbols.append(LINE_TEMPLATE % (
-                    int(code),
-                    ', '.join(names.split())
-                ))
-    else:
-        logger.error('No xmodmap available to read from')
-        return []
 
+    # because tricky problems appeared during development, add this to
+    # have some assertion that it works correctly
+    used_codes = set()
+
+    for names, code in system_mapping._xmodmap_dict.items():
+        code = int(code)
+        if not context.is_written(code):
+            # don't include any codes in the symbols file that are
+            # not used anyway
+            continue
+
+        symbols.append(LINE_TEMPLATE % (
+            code + XKB_KEYCODE_OFFSET,
+            ', '.join(names.split())
+        ))
+
+        assert code not in used_codes
+        used_codes.add(code)
+
+    # This is part of the individual injection process, so
+    # get_unknown_mappings returns stuff that is custom tailered for each
+    # configuration
     for character, code in system_mapping.get_unknown_mappings().items():
         symbols.append(LINE_TEMPLATE % (
             code + XKB_KEYCODE_OFFSET,
             character
         ))
+
+        assert code not in used_codes
+        used_codes.add(code)
 
     return symbols
 
@@ -155,7 +164,7 @@ def generate_xkb_config(context, device):
 
     logger.info('Unknown characters found, creating xkb configs')
 
-    symbols = generate_symbols_lines()
+    symbols = generate_symbols_lines(context)
 
     if len(symbols) == 0:
         logger.error('Failed to populate symbols with anything')

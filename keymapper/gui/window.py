@@ -30,7 +30,7 @@ from gi.repository import Gtk, Gdk, GLib
 
 from keymapper.data import get_data_path
 from keymapper.paths import get_config_path, get_preset_path
-from keymapper.state import custom_mapping, system_mapping
+from keymapper.state import custom_mapping, is_symbol
 from keymapper.presets import get_presets, find_newest_preset, \
     delete_preset, rename_preset, get_available_preset_name
 from keymapper.logger import logger, COMMIT_HASH, VERSION, EVDEV_VERSION, \
@@ -821,7 +821,7 @@ class Window:
             if is_this_a_macro(character):
                 continue
 
-            if system_mapping.get(character) is None:
+            if not is_symbol(character): # TODO test usage of is_symbol
                 self.show_status(CTX_MAPPING, f'Unknown mapping "{character}"')
                 break
         else:

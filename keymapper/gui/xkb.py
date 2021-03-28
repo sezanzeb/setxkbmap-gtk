@@ -19,7 +19,10 @@
 # along with key-mapper.  If not, see <https://www.gnu.org/licenses/>.
 
 
-"""Handles calls to setxkbmap. See injection/xkb.py for more info."""
+"""Handles calls to setxkbmap. See injection/xkb.py for more info.
+
+Since the daemon doesn't know about the X session the gui has to do it.
+"""
 
 
 import os
