@@ -111,9 +111,7 @@ class Injector(multiprocessing.Process):
         mapping : Mapping
         """
         self.device = device
-
-        self.context = Context(mapping)
-
+        self.context = None
         self._event_producer = None
         self._state = UNKNOWN
         self._msg_pipe = multiprocessing.Pipe()

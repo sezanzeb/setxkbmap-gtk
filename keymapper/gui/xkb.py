@@ -30,7 +30,6 @@ import subprocess
 import time
 
 from keymapper.logger import logger
-from keymapper.state import custom_mapping
 from keymapper.injection.injector import get_udef_name
 from keymapper.injection.xkb import get_xkb_symbols_name
 

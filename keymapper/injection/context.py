@@ -37,7 +37,8 @@ class Context:
     information that is specifically important to the injection.
 
     One Context exists for each injection process, which is shared
-    with all coroutines and used objects.
+    with all coroutines and used objects. It contains information that
+    is unique for a specific injection process.
 
     Benefits of the context:
     - less redundant passing around of parameters
@@ -156,7 +157,7 @@ class Context:
         if code in self.key_to_code.values():
             return True
 
-        for macro in self.macros:
+        for macro in self.macros.values():
             if code in macro.capabilities[EV_KEY]:
                 return True
 

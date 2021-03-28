@@ -99,29 +99,28 @@ def generate_symbols_lines(context):
     # have some assertion that it works correctly
     used_codes = set()
 
-    for names, code in system_mapping.xmodmap_dict.items():
+    # TODO why cant I map KP_8 on my mouse anymore?
+
+    for name, code in system_mapping.xmodmap_dict.items():
+        # TODO if name is a, how to get modified versions of it (A)
+        #  into the symbols file?
         code = int(code)
         if not context.is_written(code):
             # don't include any codes in the symbols file that are
             # not used anyway
             continue
 
-        symbols.append(LINE_TEMPLATE % (
-            code + XKB_KEYCODE_OFFSET,
-            ', '.join(names.split())
-        ))
+        logger.spam('"%s" (%s) from xmodmap is used', name, code)
+        symbols.append(LINE_TEMPLATE % (code + XKB_KEYCODE_OFFSET, name))
 
         assert code not in used_codes
         used_codes.add(code)
 
-    # This is part of the individual injection process, so
-    # get_unknown_mappings returns stuff that is custom tailered for each
-    # configuration
-    for character, code in system_mapping.get_unknown_mappings().items():
-        symbols.append(LINE_TEMPLATE % (
-            code + XKB_KEYCODE_OFFSET,
-            character
-        ))
+    # TODO store unknown mappings in the context to clarify that it is
+    #  unique per injection
+    for name, code in system_mapping.get_unknown_mappings().items():
+        logger.spam('"%s" (%s) is allocated', name, code)
+        symbols.append(LINE_TEMPLATE % (code + XKB_KEYCODE_OFFSET, name))
 
         assert code not in used_codes
         used_codes.add(code)
