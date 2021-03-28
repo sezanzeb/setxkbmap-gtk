@@ -363,7 +363,12 @@ class Injector(multiprocessing.Process):
             events=self._construct_capabilities(group['type'] == GAMEPAD)
         )
 
-        generate_xkb_config(self.context, self.device)  # TODO test
+        if self.mapping.get('generate_xkb_config'):
+            try:
+                generate_xkb_config(self.context, self.device)  # TODO test
+            except Exception as error:
+                # since this is optional, catch all exceptions and ignore them
+                logger.error('generate_xkb_config failed: %s', error)
 
         # Watch over each one of the potentially multiple devices per hardware
         for path in group['paths']:

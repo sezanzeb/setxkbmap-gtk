@@ -75,9 +75,6 @@ def apply_xkb_config(device):
         Device name as indexed in get_devices
     """
     # TODO test
-    if not custom_mapping.get('generate_xkb_config'):
-        return
-
     # needs at least 0.2 seconds for me until the mapping device
     # is visible in xinput
     for _ in range(5):
@@ -94,12 +91,7 @@ def apply_xkb_config(device):
     path = f'/usr/share/X11/xkb/symbols/{name}'
 
     if not os.path.exists(path):
-        # TODO ask the daemon if applying is needed? Or just check if a
-        #  symbols file exists?
-        logger.debug(
-            'Symbols file "%s" doesn\'t exist, not using setxkbmap',
-            path
-        )
+        logger.debug('Symbols "%s" doen\'t exist, skipping setxkbmap', path)
         return
 
     logger.info('Applying xkb configuration')

@@ -45,8 +45,8 @@ workflow:
 
 injection:
 1. running injection sees that "a" was clicked on the keyboard
-2. the injector knows based on the system_mapping that this maps to
-   e.g. 48 (KEY_B) and injects it
+2. the injector knows based on the mapping that this maps to
+   e.g. 48 and injects it
 3. the window manager sees code 48 and writes a "b" into the focused
    application, because the xkb config tells it to do so
 
@@ -99,7 +99,7 @@ def generate_symbols_lines(context):
     # have some assertion that it works correctly
     used_codes = set()
 
-    for names, code in system_mapping._xmodmap_dict.items():
+    for names, code in system_mapping.xmodmap_dict.items():
         code = int(code)
         if not context.is_written(code):
             # don't include any codes in the symbols file that are
@@ -144,9 +144,6 @@ def generate_xkb_config(context, device):
         As indexed in get_devices
     """
     # TODO test
-    if not context.mapping.get('generate_xkb_config'):
-        return
-
     name = get_xkb_symbols_name(device)
     path = f'/usr/share/X11/xkb/symbols/{name}'
 

@@ -646,7 +646,12 @@ class Window:
             )
 
             # TODO test
-            apply_xkb_config(self.selected_device)
+            if custom_mapping.get('generate_xkb_config'):
+                try:
+                    apply_xkb_config(self.selected_device)
+                except Exception as error:
+                    # since this is optional, ignore all exceptions
+                    logger.error('generate_xkb_config failed: %s', error)
 
             self.show_device_mapping_status()
             return False

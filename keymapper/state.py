@@ -73,7 +73,7 @@ class SystemMapping:
     def __init__(self):
         """Construct the system_mapping."""
         self._mapping = {}  # str to int
-        self._xmodmap_dict = {}  # str to int
+        self.xmodmap_dict = {}  # str to int
         self._allocated_unknowns = {}  # int to str  # TODO test
 
         # this may contain more entries than _mapping, since _mapping
@@ -91,15 +91,15 @@ class SystemMapping:
         """Get a mapping of all available names to their keycodes."""
         logger.debug('Gathering available keycodes')
         self.clear()
-        self._xmodmap_dict = {}
+        self.xmodmap_dict = {}
         try:
             xmodmap = subprocess.check_output(
                 ['xmodmap', '-pke'],
                 stderr=subprocess.STDOUT
             ).decode()
 
-            self._xmodmap_dict = xmodmap_to_dict(xmodmap)
-            for keycode in self._xmodmap_dict.values():
+            self.xmodmap_dict = xmodmap_to_dict(xmodmap)
+            for keycode in self.xmodmap_dict.values():
                 self._occupied_keycodes.add(keycode)
         except (subprocess.CalledProcessError, FileNotFoundError):
             # might be within a tty
@@ -118,7 +118,7 @@ class SystemMapping:
                 logger.debug('Writing "%s"', path)
                 file.write(xmodmap)
 
-        self._mapping.update(self._xmodmap_dict)
+        self._mapping.update(self.xmodmap_dict)
 
         for name, ecode in evdev.ecodes.ecodes.items():
             if name.startswith('KEY') or name.startswith('BTN'):
@@ -221,7 +221,8 @@ class SystemMapping:
 
     def get_xmodmap_name(self, code):
         """Get the first matching name for the code."""
-        for item in self._xmodmap_dict.items():
+        # TODO test
+        for item in self.xmodmap_dict.items():
             if int(item[1]) == code:
                 return item[0]
 
