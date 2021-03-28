@@ -63,6 +63,14 @@ def xmodmap_to_dict(xmodmap):
         xmodmap_dict[name] = keycode
         # TODO what about loaded mappings of the daemon?
 
+    for keycode, names in mappings:
+        # but since KP may be mapped like KP_Home KP_7 KP_Home KP_7,
+        # make another pass and add all of them if they don't already
+        # exist. don't overwrite any keycodes.
+        for name in names.split():
+            if xmodmap_dict.get(name) is None:
+                xmodmap_dict[name] = int(keycode) - XKB_KEYCODE_OFFSET
+
     return xmodmap_dict
 
 
@@ -71,8 +79,9 @@ class SystemMapping:
     def __init__(self):
         """Construct the system_mapping."""
         self._mapping = {}  # str to int
-        self.xmodmap = {}
+        self._xmodmap_dict = {}  # str to int
         self._allocated_unknowns = {}  # int to str  # TODO test
+        self.known_xkb_keys = []
 
         # this may contain more entries than _mapping, since _mapping
         # stores only one code per character, but a keyboard layout can
@@ -89,39 +98,34 @@ class SystemMapping:
         """Get a mapping of all available names to their keycodes."""
         logger.debug('Gathering available keycodes')
         self.clear()
-        xmodmap_dict = {}
+        self._xmodmap_dict = {}
         try:
             xmodmap = subprocess.check_output(
                 ['xmodmap', '-pke'],
                 stderr=subprocess.STDOUT
             ).decode()
 
-            xmodmap_dict = xmodmap_to_dict(xmodmap)
-            for keycode in xmodmap_dict.values():
+            self._xmodmap_dict = xmodmap_to_dict(xmodmap)
+            for keycode in self._xmodmap_dict.values():
                 self._occupied_keycodes.add(keycode)
-
         except (subprocess.CalledProcessError, FileNotFoundError):
             # might be within a tty
             pass
 
-            if USER != 'root':
-                # write this stuff into the key-mapper config directory,
-                # because the systemd service won't know the user sessions
-                # xmodmap
-                path = get_config_path(XMODMAP_FILENAME)
-                touch(path)
-                with open(path, 'w') as file:
-                    # TODO test instead of xmodmap.json just store the xmodmap
-                    #  output unmodified, otherwise I can't get the modified
-                    #  keys here.
-                    logger.debug('Writing "%s"', path)
-                    file.write(xmodmap)
+        if USER != 'root':
+            # write this stuff into the key-mapper config directory,
+            # because the systemd service won't know the user sessions
+            # xmodmap
+            path = get_config_path(XMODMAP_FILENAME)
+            touch(path)
+            with open(path, 'w') as file:
+                # TODO test instead of xmodmap.json it just stores the
+                #  xmodmap output unmodified, otherwise I can't get the
+                #  modified keys here.
+                logger.debug('Writing "%s"', path)
+                file.write(xmodmap)
 
-        except (subprocess.CalledProcessError, FileNotFoundError):
-            # might be within a tty
-            pass
-
-        self._mapping.update(xmodmap_dict)
+        self._mapping.update(self._xmodmap_dict)
 
         for name, ecode in evdev.ecodes.ecodes.items():
             if name.startswith('KEY') or name.startswith('BTN'):
@@ -178,6 +182,13 @@ class SystemMapping:
             # check if part of the system layout
             return self._mapping[character]
 
+        # it's unknown, allocate instead
+        # TODO test if it is known to xkb at all
+        #  generate a list from the contents of the xkb dir?
+        if character not in self.known_xkb_keys:
+            # not something xkb can do stuff with
+            return None
+
         for key, code in self._allocated_unknowns.items():
             # check if already asked to allocate before
             if key == character:
@@ -213,11 +224,11 @@ class SystemMapping:
         # TODO test
         return self._allocated_unknowns
 
-    def get_name(self, code):
+    def get_xmodmap_name(self, code):
         """Get the first matching name for the code."""
-        for entry in self.xmodmap:
-            if int(entry[0]) - XKB_KEYCODE_OFFSET == code:
-                return entry[1].split()[0]
+        for item in self._xmodmap_dict.items():
+            if int(item[1]) == code:
+                return item[0]
 
         return None
 

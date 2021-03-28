@@ -109,7 +109,7 @@ def generate_symbols_lines():
                 ))
     else:
         logger.error('No xmodmap available to read from')
-        return
+        return []
 
     for character, code in system_mapping.get_unknown_mappings().items():
         symbols.append(LINE_TEMPLATE % (

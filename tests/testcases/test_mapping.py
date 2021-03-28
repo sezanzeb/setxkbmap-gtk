@@ -26,7 +26,7 @@ import json
 from evdev.ecodes import EV_KEY, EV_ABS, ABS_HAT0X, KEY_A
 
 from keymapper.mapping import Mapping
-from keymapper.state import SystemMapping, XMODMAP_FILENAME
+from keymapper.state import SystemMapping, XMODMAP_FILENAME, XKB_KEYCODE_OFFSET
 from keymapper.config import config
 from keymapper.paths import get_preset_path
 from keymapper.key import Key
@@ -54,16 +54,22 @@ class TestSystemMapping(unittest.TestCase):
     def test_xmodmap_file(self):
         system_mapping = SystemMapping()
         path = os.path.join(tmp, XMODMAP_FILENAME)
-        os.remove(path)
+        if os.path.exists(path):
+            os.remove(path)
 
         system_mapping.populate()
         self.assertTrue(os.path.exists(path))
         with open(path, 'r') as file:
-            content = json.load(file)
-            self.assertEqual(content['a'], KEY_A)
+            content = file.read()
+            code = KEY_A + XKB_KEYCODE_OFFSET
+            for line in content.split('\n'):
+                if ' a ' in line and f' {code} ' in line:
+                    break
+            else:
+                raise AssertionError(f'Expected to find "a" and code {code}')
+
             # only xmodmap stuff should be present
-            self.assertNotIn('key_a', content)
-            self.assertNotIn('KEY_A', content)
+            self.assertNotIn('key_a', content.lower())
             self.assertNotIn('disable', content)
 
     def test_system_mapping(self):

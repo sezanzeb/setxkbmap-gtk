@@ -293,7 +293,7 @@ class Daemon:
         Parameters
         ----------
         config_dir : string
-            This path contains config.json, xmodmap.json and the
+            This path contains config.json, xmodmap and the
             presets directory
         """
         config_path = os.path.join(config_dir, 'config.json')

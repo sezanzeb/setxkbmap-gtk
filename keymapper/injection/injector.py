@@ -72,6 +72,23 @@ def is_in_capabilities(key, capabilities):
     return False
 
 
+def get_udef_name(name, suffix):
+    """Make sure the generated name is not longer than 80 chars.
+
+    Parameters
+    ----------
+    name : str
+        The original name of the device
+    suffix : str
+        One of 'mapped' or 'forwarded'
+    """
+    max_len = 80  # based on error messages
+    remaining_len = max_len - len(DEV_NAME) - len(suffix) - 2
+    middle = name[:remaining_len]
+    name = f'{DEV_NAME} {middle} {suffix}'
+    return name
+
+
 class Injector(multiprocessing.Process):
     """Keeps injecting events in the background based on mapping and config.
 
@@ -305,14 +322,6 @@ class Injector(multiprocessing.Process):
                 loop.stop()
                 return
 
-    def get_udef_name(self, name, suffix):
-        """Make sure the generated name is not longer than 80 chars."""
-        max_len = 80  # based on error messages
-        remaining_len = max_len - len(DEV_NAME) - len(suffix) - 2
-        middle = name[:remaining_len]
-        name = f'{DEV_NAME} {middle} {suffix}'
-        return name
-
     def run(self):
         """The injection worker that keeps injecting until terminated.
 
@@ -349,9 +358,9 @@ class Injector(multiprocessing.Process):
         # where mapped events go to.
         # See the Context docstring on why this is needed.
         self.context.uinput = evdev.UInput(
-            name=self.get_udef_name(self.device, 'mapped'),
+            name=get_udef_name(self.device, 'mapped'),
             phys=DEV_NAME,
-            events=self._construct_capabilities(group['type'] == 'gamepad')
+            events=self._construct_capabilities(group['type'] == GAMEPAD)
         )
 
         generate_xkb_config(self.context, self.device)  # TODO test
@@ -369,7 +378,7 @@ class Injector(multiprocessing.Process):
             # so don't merge all InputDevices into one UInput device.
             gamepad = classify(source) == GAMEPAD
             forward_to = evdev.UInput(
-                name=self.get_udef_name(source.name, 'forwarded'),
+                name=get_udef_name(source.name, 'forwarded'),
                 phys=DEV_NAME,
                 events=self._copy_capabilities(source)
             )

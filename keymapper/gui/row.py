@@ -78,12 +78,12 @@ def to_string(key):
     # first try to find the name in xmodmap to not display wrong
     # names due to the keyboard layout
     if ev_type == evdev.ecodes.EV_KEY:
-        key_name = system_mapping.get_name(code)
+        key_name = system_mapping.get_xmodmap_name(code)
 
     if key_name is None:
-        # if no result, look in the linux key constants. On a german
-        # keyboard for example z and y are switched, which will therefore
-        # cause the wrong letter to be displayed.
+        # if no result (or not a key event), look in the linux key constants.
+        # On a german keyboard for example z and y are switched, which will
+        # therefore cause the wrong letter to be displayed.
         key_name = evdev.ecodes.bytype[ev_type][code]
         if isinstance(key_name, list):
             key_name = key_name[0]

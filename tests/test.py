@@ -362,9 +362,9 @@ class InputDevice:
         time.sleep(EVENT_READ_TIMEOUT)
         try:
             event = pending_events[self.group][1].recv()
-        except UnpicklingError as error:
-            # failed in tests sometimes
-            print(error)
+        except (UnpicklingError, EOFError) as error:
+            # fails in tests sometimes during cleanup
+            self.log(error)
             return None
 
         self.log(event, 'read_one')

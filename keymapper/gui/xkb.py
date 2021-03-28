@@ -22,16 +22,13 @@
 """Handles calls to setxkbmap. See injection/xkb.py for more info."""
 
 
-# TODO no, move this to the daemon again but set DISPLAY
-
-
 import os
 import subprocess
 import time
 
 from keymapper.logger import logger
 from keymapper.state import custom_mapping
-from keymapper.getdevices import get_mapping_device_name
+from keymapper.injection.injector import get_udef_name
 from keymapper.injection.xkb import get_xkb_symbols_name
 
 
@@ -55,7 +52,7 @@ def get_device_id(device):
         logger.error(str(error))
         return None
 
-    mapped_name = get_mapping_device_name(device)
+    mapped_name = get_udef_name(device, 'mapped')
     for name, id in zip(names, ids):
         if name == mapped_name:
             device_id = id
@@ -86,7 +83,7 @@ def apply_xkb_config(device):
         if device_id is not None:
             break
     else:
-        mapped_name = get_mapping_device_name(device)
+        mapped_name = get_udef_name(device, 'mapped')
         logger.error('Failed to get device ID for "%s"', mapped_name)
         return
 

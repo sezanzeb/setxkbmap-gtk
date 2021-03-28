@@ -38,6 +38,7 @@ from keymapper.mapping import Mapping, DISABLE_CODE, DISABLE_NAME
 from keymapper.config import config, NONE, MOUSE, WHEEL, BUTTONS
 from keymapper.key import Key
 from keymapper.injection.macros import parse
+from keymapper.injection.injector import get_udef_name
 from keymapper.injection.context import Context
 from keymapper.getdevices import get_devices, classify, GAMEPAD
 
@@ -449,13 +450,13 @@ class TestInjector(unittest.TestCase):
         expected = f'{prefix} {"a" * (80 - len(suffix) - len(prefix) - 2)} {suffix}'
         self.assertEqual(len(expected), 80)
         self.assertEqual(
-            self.injector.get_udef_name('a' * 100, suffix),
+            get_udef_name('a' * 100, suffix),
             expected
         )
 
         self.injector.device = 'abcd'
         self.assertEqual(
-            self.injector.get_udef_name('abcd', 'forwarded'),
+            get_udef_name('abcd', 'forwarded'),
             'key-mapper abcd forwarded'
         )
 

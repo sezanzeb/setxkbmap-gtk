@@ -135,8 +135,8 @@ class TestDaemon(unittest.TestCase):
 
     def test_daemon(self):
         # remove the existing system mapping to force our own into it
-        if os.path.exists(get_config_path('xmodmap.json')):
-            os.remove(get_config_path('xmodmap.json'))
+        if os.path.exists(get_config_path('xmodmap')):
+            os.remove(get_config_path('xmodmap'))
 
         ev_1 = (EV_KEY, 9)
         ev_2 = (EV_ABS, 12)
@@ -213,8 +213,8 @@ class TestDaemon(unittest.TestCase):
         self.assertEqual(event.value, 1)
 
     def test_refresh_devices_on_start(self):
-        if os.path.exists(get_config_path('xmodmap.json')):
-            os.remove(get_config_path('xmodmap.json'))
+        if os.path.exists(get_config_path('xmodmap')):
+            os.remove(get_config_path('xmodmap'))
 
         ev = (EV_KEY, 9)
         keycode_to = 100
@@ -226,8 +226,9 @@ class TestDaemon(unittest.TestCase):
         system_mapping._set('a', keycode_to)
 
         # make the daemon load the file instead
-        with open(get_config_path('xmodmap.json'), 'w') as file:
-            json.dump(system_mapping._mapping, file, indent=4)
+        with open(get_config_path('xmodmap'), 'w') as file:
+            for item in system_mapping._mapping.items():
+                file.write(f'keycode {item[1] + 8} = {item[0]}\n')
         system_mapping.clear()
 
         preset = 'foo'
@@ -314,9 +315,9 @@ class TestDaemon(unittest.TestCase):
         config.path = config_path
         config.save_config()
 
-        xmodmap_path = os.path.join(config_dir, 'xmodmap.json')
+        xmodmap_path = os.path.join(config_dir, 'xmodmap')
         with open(xmodmap_path, 'w') as file:
-            file.write(f'{{"{to_name}":{to_keycode}}}')
+            file.write(f'keycode {to_keycode + 8} = {to_name}')
 
         self.daemon = Daemon()
         self.daemon.set_config_dir(config_dir)

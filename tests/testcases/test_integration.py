@@ -355,12 +355,12 @@ class TestIntegration(unittest.TestCase):
             status = self.get_status_text()
             self.assertIn('Permission denied', status)
 
-    def test_show_injection_result_failure(self):
+    def test_check_injection_result_failure(self):
         def get_state(_=None):
             return FAILED
 
         with patch.object(self.window.dbus, 'get_state', get_state):
-            self.window.show_injection_result()
+            self.window.check_injection_result()
             text = self.get_status_text()
             self.assertIn('Failed', text)
 
