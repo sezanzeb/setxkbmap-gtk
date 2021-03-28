@@ -42,7 +42,7 @@ def get_device_id(device):
     Parameters
     ----------
     device : string
-        Device name as indexed in get_devices
+        Device name as found in evtest
     """
     try:
         names = subprocess.check_output(['xinput', 'list', '--name-only'])
@@ -54,9 +54,8 @@ def get_device_id(device):
         logger.error(str(error))
         return None
 
-    mapped_name = get_udef_name(device, 'mapped')
     for name, id in zip(names, ids):
-        if name == mapped_name:
+        if name == device:
             device_id = id
             break
     else:
@@ -76,13 +75,14 @@ def apply_xkb_config(device):
     # TODO test
     # needs at least 0.2 seconds for me until the mapping device
     # is visible in xinput
+    mapped_name = get_udef_name(device, 'mapped')
+
     for _ in range(5):
         time.sleep(0.2)
-        device_id = get_device_id(device)
+        device_id = get_device_id(mapped_name)
         if device_id is not None:
             break
     else:
-        mapped_name = get_udef_name(device, 'mapped')
         logger.error('Failed to get device ID for "%s"', mapped_name)
         return
 
@@ -96,7 +96,7 @@ def apply_xkb_config(device):
     logger.info('Applying xkb configuration')
 
     # XkbBadKeyboard: wrong -device id
-    device_id = get_device_id(device)
+    device_id = get_device_id(mapped_name)
     if device_id is None:
         return
 

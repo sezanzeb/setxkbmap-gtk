@@ -99,10 +99,6 @@ def generate_symbols_lines(context):
     # have some assertion that it works correctly
     used_codes = set()
 
-    # TODO why cant I map kp_8 on my mouse anymore?
-    #  -> because of the casing. It should be KP_8
-    #  -> mapping of .lower() to correct valid_symbol
-
     for name, code in system_mapping.xmodmap_dict.items():
         # TODO if name is a, how to get modified versions of it (A)
         #  into the symbols file?
