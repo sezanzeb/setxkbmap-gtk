@@ -47,7 +47,7 @@ def xmodmap_to_dict(xmodmap):
         The complete output of `xmodmap -pke`, but with keycodes
         reduced by XKB_KEYCODE_OFFSET already
     """
-    mappings = re.findall(r'(\d+) = (.+)\n', xmodmap.lower() + '\n')
+    mappings = re.findall(r'(\d+) = (.+)\n', xmodmap + '\n')
     xmodmap_dict = {}
     for x_code, names in mappings:
         # there might be multiple, like:
@@ -140,11 +140,11 @@ class SystemMapping:
 
     def _set(self, name, code):
         """Map name to code."""
-        self._mapping[str(name).lower()] = code
+        self._mapping[str(name)] = code
 
     def get(self, name):
         """Return the code mapped to the key."""
-        return self._mapping.get(str(name).lower())
+        return self._mapping.get(str(name))
 
     def get_key(self, code):
         """Return the key that maps to the provided code."""
@@ -172,7 +172,7 @@ class SystemMapping:
         if character is None:
             return None
 
-        character = str(character).lower()
+        character = str(character)
 
         if character in self._mapping:
             # check if part of the system layout
