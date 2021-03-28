@@ -20,11 +20,13 @@
 
 
 import unittest
+from unittest import mock
 
 import evdev
 
-from keymapper.getdevices import _GetDevices, get_devices, is_gamepad, \
-    refresh_devices
+from keymapper.getdevices import _GetDevices, get_devices, classify, \
+    refresh_devices, GAMEPAD, MOUSE, UNKNOWN, GRAPHICS_TABLET, TOUCHPAD, \
+    KEYBOARD
 
 from tests.test import cleanup, fixtures
 
@@ -37,11 +39,7 @@ class FakePipe:
 
 
 class TestGetDevices(unittest.TestCase):
-    def setUp(self):
-        self.original_list_devices = evdev.list_devices
-
     def tearDown(self):
-        evdev.list_devices = self.original_list_devices
         cleanup()
 
     def test_get_devices(self):
@@ -59,22 +57,22 @@ class TestGetDevices(unittest.TestCase):
                     'device 1',
                     'device 1'
                 ],
-                'gamepad': False
+                'type': MOUSE
             },
             'device 2': {
                 'paths': ['/dev/input/event20'],
                 'devices': ['device 2'],
-                'gamepad': False
+                'type': KEYBOARD
             },
             'gamepad': {
                 'paths': ['/dev/input/event30'],
                 'devices': ['gamepad'],
-                'gamepad': True
+                'type': GAMEPAD
             },
             'key-mapper device 2': {
                 'paths': ['/dev/input/event40'],
                 'devices': ['key-mapper device 2'],
-                'gamepad': False
+                'type': KEYBOARD
             },
         })
         self.assertDictEqual(pipe.devices, get_devices(include_keymapper=True))
@@ -92,17 +90,17 @@ class TestGetDevices(unittest.TestCase):
                     'device 1',
                     'device 1'
                 ],
-                'gamepad': False
+                'type': MOUSE
             },
             'device 2': {
                 'paths': ['/dev/input/event20'],
                 'devices': ['device 2'],
-                'gamepad': False
+                'type': KEYBOARD
             },
             'gamepad': {
                 'paths': ['/dev/input/event30'],
                 'devices': ['gamepad'],
-                'gamepad': True
+                'type': GAMEPAD
             },
         })
 
@@ -120,11 +118,10 @@ class TestGetDevices(unittest.TestCase):
             }
         }
 
-        evdev.list_devices = list_devices
-
-        refresh_devices()
-        self.assertNotIn('camera', get_devices())
-        self.assertIn('gamepad', get_devices())
+        with mock.patch('evdev.list_devices', list_devices):
+            refresh_devices()
+            self.assertNotIn('camera', get_devices())
+            self.assertIn('gamepad', get_devices())
 
     def test_device_with_only_ev_abs(self):
         def list_devices():
@@ -143,13 +140,12 @@ class TestGetDevices(unittest.TestCase):
             }
         }
 
-        evdev.list_devices = list_devices
+        with mock.patch('evdev.list_devices', list_devices):
+            refresh_devices()
+            self.assertIn('gamepad', get_devices())
+            self.assertNotIn('qux', get_devices())
 
-        refresh_devices()
-        self.assertIn('gamepad', get_devices())
-        self.assertNotIn('qux', get_devices())
-
-    def test_is_gamepad(self):
+    def test_classify(self):
         # properly detects if the device is a gamepad
         EV_ABS = evdev.ecodes.EV_ABS
         EV_KEY = evdev.ecodes.EV_KEY
@@ -163,38 +159,58 @@ class TestGetDevices(unittest.TestCase):
                 assert not absinfo
                 return self.c
 
-        """positive tests"""
+        """gamepads"""
 
-        self.assertTrue(is_gamepad(FakeDevice({
+        self.assertEqual(classify(FakeDevice({
             EV_ABS: [evdev.ecodes.ABS_X, evdev.ecodes.ABS_Y],
             EV_KEY: [evdev.ecodes.BTN_A]
-        })))
+        })), GAMEPAD)
 
-        """negative tests"""
+        """mice"""
 
-        self.assertFalse(is_gamepad(FakeDevice({
+        self.assertEqual(classify(FakeDevice({
+            EV_REL: [evdev.ecodes.REL_X, evdev.ecodes.REL_Y],
+            EV_KEY: [evdev.ecodes.BTN_LEFT]
+        })), MOUSE)
+
+        """keyboard"""
+
+        self.assertEqual(classify(FakeDevice({
+            EV_KEY: [evdev.ecodes.KEY_A]
+        })), KEYBOARD)
+
+        """touchpads"""
+
+        self.assertEqual(classify(FakeDevice({
+            EV_KEY: [evdev.ecodes.KEY_A],
+            EV_ABS: [evdev.ecodes.ABS_MT_POSITION_X]
+        })), TOUCHPAD)
+
+        """weird combos"""
+
+        self.assertEqual(classify(FakeDevice({
             EV_ABS: [evdev.ecodes.ABS_X, evdev.ecodes.ABS_Y],
             EV_KEY: [evdev.ecodes.BTN_A],
             EV_REL: [evdev.ecodes.REL_X]
-        })))
+        })), UNKNOWN)
 
-        self.assertFalse(is_gamepad(FakeDevice({
+        self.assertEqual(classify(FakeDevice({
             EV_ABS: [evdev.ecodes.ABS_X, evdev.ecodes.ABS_Y],
             EV_KEY: [evdev.ecodes.KEY_1]
-        })))
+        })), UNKNOWN)
 
-        self.assertFalse(is_gamepad(FakeDevice({
+        self.assertEqual(classify(FakeDevice({
             EV_ABS: [evdev.ecodes.ABS_X],
             EV_KEY: [evdev.ecodes.BTN_A]
-        })))
+        })), UNKNOWN)
 
-        self.assertFalse(is_gamepad(FakeDevice({
+        self.assertEqual(classify(FakeDevice({
             EV_KEY: [evdev.ecodes.BTN_A]
-        })))
+        })), UNKNOWN)
 
-        self.assertFalse(is_gamepad(FakeDevice({
+        self.assertEqual(classify(FakeDevice({
             EV_ABS: [evdev.ecodes.ABS_X]
-        })))
+        })), UNKNOWN)
 
 
 if __name__ == "__main__":

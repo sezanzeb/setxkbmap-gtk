@@ -20,12 +20,13 @@
 
 
 import unittest
+from unittest import mock
 import time
 import copy
 
 import evdev
-from evdev.ecodes import EV_REL, EV_KEY, EV_ABS, ABS_HAT0X, BTN_LEFT, KEY_A, \
-    REL_X, REL_Y, REL_WHEEL, REL_HWHEEL, BTN_A, ABS_X, ABS_Y, \
+from evdev.ecodes import EV_REL, EV_KEY, EV_ABS, ABS_HAT0X, BTN_LEFT, \
+    KEY_A, REL_X, REL_Y, REL_WHEEL, REL_HWHEEL, BTN_A, ABS_X, ABS_Y, \
     ABS_Z, ABS_RZ, ABS_VOLUME, KEY_B, KEY_C
 
 from keymapper.injection.injector import Injector, is_in_capabilities, \
@@ -38,15 +39,12 @@ from keymapper.config import config, NONE, MOUSE, WHEEL, BUTTONS
 from keymapper.key import Key
 from keymapper.injection.macros import parse
 from keymapper.injection.context import Context
-from keymapper import utils
-from keymapper.getdevices import get_devices, is_gamepad
+from keymapper.getdevices import get_devices, classify, GAMEPAD
 
-from tests.test import new_event, pending_events, fixtures, \
+from tests.test import new_event, push_events, fixtures, \
     EVENT_READ_TIMEOUT, uinput_write_history_pipe, \
-    MAX_ABS, quick_cleanup, read_write_history_pipe, InputDevice, uinputs
-
-
-original_smeab = utils.should_map_as_btn
+    MAX_ABS, quick_cleanup, read_write_history_pipe, InputDevice, uinputs, \
+    keyboard_keys
 
 
 class TestInjector(unittest.TestCase):
@@ -69,8 +67,6 @@ class TestInjector(unittest.TestCase):
         evdev.InputDevice.grab = grab_fail_twice
 
     def tearDown(self):
-        utils.should_map_as_btn = original_smeab
-
         if self.injector is not None:
             self.injector.stop_injecting()
             self.assertEqual(self.injector.get_state(), STOPPED)
@@ -89,7 +85,7 @@ class TestInjector(unittest.TestCase):
         # _grab_device
         self.injector.context = Context(custom_mapping)
         device = self.injector._grab_device(path)
-        gamepad = is_gamepad(device)
+        gamepad = classify(device) == GAMEPAD
         self.assertFalse(gamepad)
         self.assertEqual(self.failed, 2)
         # success on the third try
@@ -139,7 +135,7 @@ class TestInjector(unittest.TestCase):
 
         path = '/dev/input/event30'
         device = self.injector._grab_device(path)
-        gamepad = is_gamepad(device)
+        gamepad = classify(device) == GAMEPAD
         self.assertIsNotNone(device)
         self.assertTrue(gamepad)
 
@@ -170,7 +166,7 @@ class TestInjector(unittest.TestCase):
         custom_mapping.change(Key(EV_KEY, BTN_A, 1), 'a')
         device = self.injector._grab_device(path)
         self.assertIsNotNone(device)
-        gamepad = is_gamepad(device)
+        gamepad = classify(device) == GAMEPAD
         self.assertTrue(gamepad)
         capabilities = self.injector._construct_capabilities(gamepad)
         self.assertNotIn(EV_ABS, capabilities)
@@ -188,7 +184,7 @@ class TestInjector(unittest.TestCase):
         # the right joystick maps as mouse, so it is grabbed
         # even with an empty mapping
         self.assertIsNotNone(device)
-        gamepad = is_gamepad(device)
+        gamepad = classify(device) == GAMEPAD
         self.assertTrue(gamepad)
         capabilities = self.injector._construct_capabilities(gamepad)
         self.assertNotIn(EV_ABS, capabilities)
@@ -196,7 +192,7 @@ class TestInjector(unittest.TestCase):
 
         custom_mapping.change(Key(EV_KEY, BTN_A, 1), 'a')
         device = self.injector._grab_device(path)
-        gamepad = is_gamepad(device)
+        gamepad = classify(device) == GAMEPAD
         self.assertIsNotNone(device)
         self.assertTrue(gamepad)
         capabilities = self.injector._construct_capabilities(gamepad)
@@ -235,7 +231,7 @@ class TestInjector(unittest.TestCase):
         fixtures[path]['capabilities'][EV_KEY].append(BTN_LEFT)
         fixtures[path]['capabilities'][EV_KEY].append(KEY_A)
         device = self.injector._grab_device(path)
-        gamepad = is_gamepad(device)
+        gamepad = classify(device) == GAMEPAD
         capabilities = self.injector._construct_capabilities(gamepad)
         self.assertIn(EV_KEY, capabilities)
         self.assertIn(evdev.ecodes.BTN_MOUSE, capabilities[EV_KEY])
@@ -245,7 +241,7 @@ class TestInjector(unittest.TestCase):
 
         path = '/dev/input/event30'
         device = self.injector._grab_device(path)
-        gamepad = is_gamepad(device)
+        gamepad = classify(device) == GAMEPAD
         self.assertIn(EV_KEY, device.capabilities())
         self.assertNotIn(evdev.ecodes.BTN_MOUSE, device.capabilities()[EV_KEY])
         capabilities = self.injector._construct_capabilities(gamepad)
@@ -264,16 +260,13 @@ class TestInjector(unittest.TestCase):
         self.assertEqual(self.failed, 0)
 
     def test_skip_unknown_device(self):
+        custom_mapping.change(Key(EV_KEY, 10, 1), 'a')
+
         # skips a device because its capabilities are not used in the mapping
         self.injector = Injector('device 1', custom_mapping)
         self.injector.context = Context(custom_mapping)
         path = '/dev/input/event11'
         device = self.injector._grab_device(path)
-
-        # make sure the test uses a fixture without interesting capabilities
-        capabilities = evdev.InputDevice(path).capabilities()
-        self.assertEqual(len(capabilities.get(EV_KEY, [])), 0)
-        self.assertEqual(len(capabilities.get(EV_ABS, [])), 0)
 
         # skips the device alltogether, so no grab attempts fail
         self.assertEqual(self.failed, 0)
@@ -313,12 +306,12 @@ class TestInjector(unittest.TestCase):
         divisor = 10
         x = MAX_ABS / pointer_speed / divisor
         y = MAX_ABS / pointer_speed / divisor
-        pending_events['gamepad'] = [
+        push_events('gamepad', [
             new_event(EV_ABS, ABS_X, x),
             new_event(EV_ABS, ABS_Y, y),
             new_event(EV_ABS, ABS_X, -x),
             new_event(EV_ABS, ABS_Y, -y),
-        ]
+        ])
 
         self.injector = Injector('gamepad', custom_mapping)
         self.injector.start()
@@ -353,7 +346,7 @@ class TestInjector(unittest.TestCase):
         self.assertEqual(len(history), count_x + count_y)
 
     def test_gamepad_forward_joysticks(self):
-        pending_events['gamepad'] = [
+        push_events('gamepad', [
             # should forward them unmodified
             new_event(EV_ABS, ABS_X, 10),
             new_event(EV_ABS, ABS_Y, 20),
@@ -361,7 +354,7 @@ class TestInjector(unittest.TestCase):
             new_event(EV_ABS, ABS_Y, -40),
             new_event(EV_KEY, BTN_A, 1),
             new_event(EV_KEY, BTN_A, 0)
-        ] * 2
+        ] * 2)
 
         custom_mapping.set('gamepad.joystick.left_purpose', NONE)
         custom_mapping.set('gamepad.joystick.right_purpose', NONE)
@@ -389,10 +382,10 @@ class TestInjector(unittest.TestCase):
         # map one of the triggers to BTN_NORTH, while the other one
         # should be forwarded unchanged
         value = MAX_ABS // 2
-        pending_events['gamepad'] = [
+        push_events('gamepad', [
             new_event(EV_ABS, ABS_Z, value),
             new_event(EV_ABS, ABS_RZ, value),
-        ]
+        ])
 
         # ABS_Z -> 77
         # ABS_RZ is not mapped
@@ -449,6 +442,23 @@ class TestInjector(unittest.TestCase):
         # it can still debounce stuff though
         self.assertIsNone(self.injector._event_producer.max_abs)
 
+    def test_get_udef_name(self):
+        self.injector = Injector('device 1', custom_mapping)
+        suffix = 'mapped'
+        prefix = 'key-mapper'
+        expected = f'{prefix} {"a" * (80 - len(suffix) - len(prefix) - 2)} {suffix}'
+        self.assertEqual(len(expected), 80)
+        self.assertEqual(
+            self.injector.get_udef_name('a' * 100, suffix),
+            expected
+        )
+
+        self.injector.device = 'abcd'
+        self.assertEqual(
+            self.injector.get_udef_name('abcd', 'forwarded'),
+            'key-mapper abcd forwarded'
+        )
+
     def test_capabilities_and_uinput_presence(self):
         custom_mapping.change(Key(EV_KEY, KEY_A, 1), 'c')
         custom_mapping.change(Key(EV_REL, REL_HWHEEL, 1), 'k(b)')
@@ -504,8 +514,8 @@ class TestInjector(unittest.TestCase):
         self.assertIn(EV_REL, forwarded_foo.capabilities())
         self.assertIn(EV_KEY, forwarded.capabilities())
         self.assertEqual(
-            len(forwarded.capabilities()[EV_KEY]),
-            len(evdev.ecodes.keys)
+            sorted(forwarded.capabilities()[EV_KEY]),
+            keyboard_keys
         )
 
     def test_injector(self):
@@ -529,7 +539,7 @@ class TestInjector(unittest.TestCase):
         system_mapping._set('key_q', code_q)
         system_mapping._set('w', code_w)
 
-        pending_events['device 2'] = [
+        push_events('device 2', [
             # should execute a macro...
             new_event(EV_KEY, 8, 1),
             new_event(EV_KEY, 9, 1),  # ...now
@@ -542,7 +552,7 @@ class TestInjector(unittest.TestCase):
             new_event(EV_KEY, 10, 1),
             new_event(EV_KEY, 10, 0),
             new_event(3124, 3564, 6542),
-        ]
+        ])
 
         self.injector = Injector('device 2', custom_mapping)
         self.assertEqual(self.injector.get_state(), UNKNOWN)
@@ -641,12 +651,12 @@ class TestInjector(unittest.TestCase):
                 while uinput_write_history_pipe[0].poll():
                     uinput_write_history_pipe[0].recv()
 
-            pending_events['gamepad'] = [
+            push_events('gamepad', [
                 new_event(*w_down),
                 new_event(*d_down),
                 new_event(*w_up),
                 new_event(*d_up),
-            ]
+            ])
 
             self.injector = Injector('gamepad', custom_mapping)
 
@@ -670,12 +680,12 @@ class TestInjector(unittest.TestCase):
 
         """yes"""
 
-        utils.should_map_as_btn = lambda *args: True
-        history = do_stuff()
-        self.assertEqual(history.count((EV_KEY, code_w, 1)), 1)
-        self.assertEqual(history.count((EV_KEY, code_d, 1)), 1)
-        self.assertEqual(history.count((EV_KEY, code_w, 0)), 1)
-        self.assertEqual(history.count((EV_KEY, code_d, 0)), 1)
+        with mock.patch('keymapper.utils.should_map_as_btn', lambda *_: True):
+            history = do_stuff()
+            self.assertEqual(history.count((EV_KEY, code_w, 1)), 1)
+            self.assertEqual(history.count((EV_KEY, code_d, 1)), 1)
+            self.assertEqual(history.count((EV_KEY, code_w, 0)), 1)
+            self.assertEqual(history.count((EV_KEY, code_d, 0)), 1)
 
     def test_wheel(self):
         # this tests both keycode_mapper and event_producer, and it seems
@@ -701,14 +711,14 @@ class TestInjector(unittest.TestCase):
         system_mapping._set('c', code_c)
 
         device_name = 'device 1'
-        pending_events[device_name] = [
+        push_events(device_name, [
             new_event(*w_up),
         ] * 10 + [
             new_event(*hw_right),
             new_event(*w_up),
         ] * 5 + [
             new_event(*hw_left)
-        ]
+        ])
 
         self.injector = Injector(device_name, custom_mapping)
 
@@ -774,19 +784,23 @@ class TestInjector(unittest.TestCase):
             # avoid going into any mainloop
             raise Stop()
 
-        self.injector._construct_capabilities = _construct_capabilities
-        try:
-            self.injector.run()
-        except Stop:
-            pass
+        with mock.patch.object(
+            self.injector,
+            '_construct_capabilities',
+            _construct_capabilities
+        ):
+            try:
+                self.injector.run()
+            except Stop:
+                pass
 
-        # one call
-        self.assertEqual(len(history), 1)
-        # first argument of the first call
-        macros = self.injector.context.macros
-        self.assertEqual(len(macros), 2)
-        self.assertEqual(macros[(ev_1, ev_2, ev_3)].code, 'k(a)')
-        self.assertEqual(macros[(ev_2, ev_1, ev_3)].code, 'k(a)')
+            # one call
+            self.assertEqual(len(history), 1)
+            # first argument of the first call
+            macros = self.injector.context.macros
+            self.assertEqual(len(macros), 2)
+            self.assertEqual(macros[(ev_1, ev_2, ev_3)].code, 'k(a)')
+            self.assertEqual(macros[(ev_2, ev_1, ev_3)].code, 'k(a)')
 
     def test_key_to_code(self):
         mapping = Mapping()

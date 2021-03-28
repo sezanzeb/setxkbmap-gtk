@@ -56,6 +56,10 @@ migrate_path()
 
 def get_available_preset_name(device, preset='new preset', copy=False):
     """Increment the preset name until it is available."""
+    if device is None:
+        # endless loop otherwise
+        raise ValueError('Device may not be None')
+
     preset = preset.strip()
 
     if copy and not re.match(r'^.+\scopy( \d+)?$', preset):
@@ -178,7 +182,7 @@ def delete_preset(device, preset):
 def rename_preset(device, old_preset_name, new_preset_name):
     """Rename one of the users presets while avoiding name conflicts."""
     if new_preset_name == old_preset_name:
-        return
+        return None
 
     new_preset_name = get_available_preset_name(device, new_preset_name)
     logger.info('Moving "%s" to "%s"', old_preset_name, new_preset_name)
@@ -189,3 +193,4 @@ def rename_preset(device, old_preset_name, new_preset_name):
     # set the modification date to now
     now = time.time()
     os.utime(get_preset_path(device, new_preset_name), (now, now))
+    return new_preset_name

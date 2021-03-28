@@ -45,19 +45,33 @@ class Install(install):
         install.run(self)
 
 
+def get_packages():
+    """Return all modules used in key-mapper.
+
+    For example 'keymapper.gui'.
+    """
+    result = ['keymapper']
+    for name in os.listdir('keymapper'):
+        if not os.path.isdir(f'keymapper/{name}'):
+            continue
+
+        if name == '__pycache__':
+            continue
+
+        result.append(f'keymapper.{name}')
+
+    return result
+
+
 setup(
     name='key-mapper',
-    version='0.7.1',
+    version='0.8.0',
     description='A tool to change the mapping of your input device buttons',
     author='Sezanzeb',
     author_email='proxima@sezanzeb.de',
     url='https://github.com/sezanzeb/key-mapper',
     license='GPL-3.0',
-    packages=[
-        'keymapper',
-        'keymapper.gui',
-        'keymapper.injection'
-    ],
+    packages=get_packages(),
     data_files=[
         # see development.md#files
         ('/usr/share/key-mapper/', glob.glob('data/*')),
@@ -69,9 +83,9 @@ setup(
         ('/etc/xdg/autostart/', ['data/key-mapper-autoload.desktop']),
         ('/etc/udev/rules.d/', ['data/key-mapper.rules']),
         ('/usr/bin/', ['bin/key-mapper-gtk']),
-        ('/usr/bin/', ['bin/key-mapper-gtk-pkexec']),
         ('/usr/bin/', ['bin/key-mapper-service']),
         ('/usr/bin/', ['bin/key-mapper-control']),
+        ('/usr/bin/', ['bin/key-mapper-helper']),
     ],
     install_requires=[
         'setuptools',

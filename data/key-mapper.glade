@@ -2,248 +2,30 @@
 <!-- Generated with glade 3.38.2 -->
 <interface>
   <requires lib="gtk+" version="3.22"/>
+  <object class="GtkImage" id="about-icon">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">help-about</property>
+  </object>
   <object class="GtkImage" id="check-icon">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <property name="icon-name">dialog-ok</property>
+  </object>
+  <object class="GtkImage" id="copy-icon">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">edit-copy</property>
   </object>
   <object class="GtkImage" id="delete-icon">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <property name="icon-name">edit-delete</property>
   </object>
-  <object class="GtkDialog" id="error_dialog">
-    <property name="can-focus">False</property>
-    <property name="border-width">4</property>
-    <property name="title" translatable="yes">Key Mapper</property>
-    <property name="modal">True</property>
-    <property name="window-position">center</property>
-    <property name="icon">key-mapper.svg</property>
-    <property name="type-hint">dialog</property>
-    <property name="urgency-hint">True</property>
-    <child internal-child="vbox">
-      <object class="GtkBox">
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
-        <property name="orientation">vertical</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="halign">center</property>
-            <property name="margin-top">10</property>
-            <property name="layout-style">end</property>
-            <child>
-              <object class="GtkButton" id="close_error_dialog">
-                <property name="label">gtk-close</property>
-                <property name="use-action-appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="can-default">True</property>
-                <property name="receives-default">False</property>
-                <property name="use-stock">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="pack-type">end</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkBox">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <child>
-              <object class="GtkImage" id="error-image">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="margin-end">10</property>
-                <property name="yalign">0</property>
-                <property name="icon-name">dialog-error</property>
-                <property name="icon_size">6</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkBox">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="margin-end">10</property>
-                <property name="orientation">vertical</property>
-                <child>
-                  <object class="GtkLabel" id="primary_error_label">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="ypad">6</property>
-                    <property name="use-markup">True</property>
-                    <property name="xalign">0</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="secondary_error_label">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="ypad">6</property>
-                    <property name="use-markup">True</property>
-                    <property name="xalign">0</property>
-                    <property name="yalign">0</property>
-                  </object>
-                  <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
-                    <property name="position">1</property>
-                  </packing>
-                </child>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">2</property>
-          </packing>
-        </child>
-      </object>
-    </child>
-    <action-widgets>
-      <action-widget response="-7">close_error_dialog</action-widget>
-    </action-widgets>
-  </object>
-  <object class="GtkImage" id="gtk-delete-icon">
+  <object class="GtkImage" id="gtk-delete-icon1">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <property name="icon-name">gtk-delete</property>
-  </object>
-  <object class="GtkDialog" id="unsaved_changes">
-    <property name="can-focus">False</property>
-    <property name="border-width">4</property>
-    <property name="title" translatable="yes">Key Mapper</property>
-    <property name="modal">True</property>
-    <property name="window-position">center</property>
-    <property name="icon">key-mapper.svg</property>
-    <property name="type-hint">dialog</property>
-    <property name="urgency-hint">True</property>
-    <child internal-child="vbox">
-      <object class="GtkBox">
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
-        <property name="orientation">vertical</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="halign">center</property>
-            <property name="margin-top">10</property>
-            <property name="layout-style">end</property>
-            <child>
-              <object class="GtkButton" id="go_back">
-                <property name="label">Continue</property>
-                <property name="use-action-appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="can-default">True</property>
-                <property name="receives-default">False</property>
-                <property name="image">gtk-delete-icon</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="go_ahead">
-                <property name="label" translatable="yes">Go Back</property>
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="receives-default">True</property>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="pack-type">end</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkBox">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <child>
-              <object class="GtkImage" id="error-image1">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="margin-end">10</property>
-                <property name="yalign">0</property>
-                <property name="icon-name">dialog-warning</property>
-                <property name="icon_size">6</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="secondary_error_label1">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="margin-start">10</property>
-                <property name="margin-end">10</property>
-                <property name="ypad">6</property>
-                <property name="label" translatable="yes">You have got unsaved changes!</property>
-                <property name="use-markup">True</property>
-                <property name="xalign">0</property>
-                <property name="yalign">0.5</property>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">2</property>
-          </packing>
-        </child>
-      </object>
-    </child>
-    <action-widgets>
-      <action-widget response="-3">go_back</action-widget>
-      <action-widget response="-6">go_ahead</action-widget>
-    </action-widgets>
   </object>
   <object class="GtkImage" id="gtk-redo-icon">
     <property name="visible">True</property>
@@ -254,7 +36,7 @@
     <property name="lower">2</property>
     <property name="upper">9</property>
     <property name="step-increment">1</property>
-    <property name="page-increment">10</property>
+    <property name="page-increment">6</property>
   </object>
   <object class="GtkImage" id="new-icon">
     <property name="visible">True</property>
@@ -286,7 +68,7 @@
             <property name="orientation">vertical</property>
             <child>
               <object class="GtkMenuBar">
-                <property name="height-request">20</property>
+                <property name="height-request">18</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="opacity">0</property>
@@ -301,11 +83,11 @@
               <object class="GtkBox" id="devices">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">20</property>
-                <property name="margin-end">20</property>
-                <property name="margin-bottom">20</property>
+                <property name="margin-start">18</property>
+                <property name="margin-end">18</property>
+                <property name="margin-bottom">18</property>
                 <property name="border-width">0</property>
-                <property name="spacing">10</property>
+                <property name="spacing">6</property>
                 <child>
                   <object class="GtkLabel">
                     <property name="width-request">50</property>
@@ -322,7 +104,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkComboBoxText" id="device_selection">
+                  <object class="GtkComboBox" id="device_selection">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <signal name="changed" handler="on_select_device" swapped="no"/>
@@ -351,6 +133,23 @@ To give your keys back their original mapping.</property>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
                     <property name="position">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="about">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="receives-default">True</property>
+                    <property name="halign">end</property>
+                    <property name="image">about-icon</property>
+                    <property name="always-show-image">True</property>
+                    <signal name="clicked" handler="on_about_clicked" swapped="no"/>
+                    <accelerator key="Delete" signal="activate" modifiers="GDK_SHIFT_MASK"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">3</property>
                   </packing>
                 </child>
               </object>
@@ -397,14 +196,15 @@ To give your keys back their original mapping.</property>
                   <object class="GtkBox" id="preset_settings">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="border-width">20</property>
+                    <property name="border-width">18</property>
                     <property name="orientation">vertical</property>
-                    <property name="spacing">10</property>
+                    <property name="spacing">6</property>
                     <child>
                       <object class="GtkBox" id="button_container">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="spacing">10</property>
+                        <property name="margin-bottom">12</property>
+                        <property name="spacing">6</property>
                         <property name="homogeneous">True</property>
                         <child>
                           <object class="GtkButton" id="apply_preset">
@@ -413,9 +213,9 @@ To give your keys back their original mapping.</property>
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="receives-default">True</property>
-                            <property name="tooltip-text" translatable="yes">Presets need to be saved before they can be applied.
-Don't hold down any keys while the injection starts.</property>
+                            <property name="tooltip-text" translatable="yes">Don't hold down any keys while the injection starts.</property>
                             <property name="image">check-icon</property>
+                            <property name="relief">none</property>
                             <property name="always-show-image">True</property>
                             <signal name="clicked" handler="on_apply_preset_clicked" swapped="no"/>
                           </object>
@@ -426,15 +226,16 @@ Don't hold down any keys while the injection starts.</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkButton" id="save_preset">
-                            <property name="label">Save</property>
+                          <object class="GtkButton" id="copy_preset">
+                            <property name="label">Copy</property>
                             <property name="width-request">80</property>
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="receives-default">True</property>
-                            <property name="image">save-icon</property>
+                            <property name="image">copy-icon</property>
+                            <property name="relief">none</property>
                             <property name="always-show-image">True</property>
-                            <signal name="clicked" handler="on_save_preset_clicked" swapped="no"/>
+                            <signal name="clicked" handler="on_copy_preset_clicked" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">True</property>
@@ -449,10 +250,11 @@ Don't hold down any keys while the injection starts.</property>
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="receives-default">True</property>
-                            <property name="tooltip-text" translatable="yes">Hold down ctrl and click here to copy the current preset</property>
                             <property name="image">new-icon</property>
+                            <property name="relief">none</property>
                             <property name="always-show-image">True</property>
                             <signal name="clicked" handler="on_create_preset_clicked" swapped="no"/>
+                            <accelerator key="n" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                           </object>
                           <packing>
                             <property name="expand">True</property>
@@ -468,6 +270,7 @@ Don't hold down any keys while the injection starts.</property>
                             <property name="can-focus">True</property>
                             <property name="receives-default">True</property>
                             <property name="image">delete-icon</property>
+                            <property name="relief">none</property>
                             <property name="always-show-image">True</property>
                             <signal name="clicked" handler="on_delete_preset_clicked" swapped="no"/>
                           </object>
@@ -488,7 +291,7 @@ Don't hold down any keys while the injection starts.</property>
                       <object class="GtkBox" id="preset_dropdown_container">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="spacing">10</property>
+                        <property name="spacing">6</property>
                         <child>
                           <object class="GtkLabel">
                             <property name="width-request">50</property>
@@ -528,7 +331,7 @@ Don't hold down any keys while the injection starts.</property>
                       <object class="GtkBox" id="rename_container">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="spacing">10</property>
+                        <property name="spacing">6</property>
                         <child>
                           <object class="GtkLabel">
                             <property name="visible">True</property>
@@ -544,9 +347,38 @@ Don't hold down any keys while the injection starts.</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkEntry" id="preset_name_input">
+                          <object class="GtkBox">
                             <property name="visible">True</property>
-                            <property name="can-focus">True</property>
+                            <property name="can-focus">False</property>
+                            <child>
+                              <object class="GtkEntry" id="preset_name_input">
+                                <property name="visible">True</property>
+                                <property name="can-focus">True</property>
+                                <signal name="activate" handler="on_rename_button_clicked" swapped="no"/>
+                              </object>
+                              <packing>
+                                <property name="expand">True</property>
+                                <property name="fill">True</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkButton" id="rename-button">
+                                <property name="visible">True</property>
+                                <property name="can-focus">True</property>
+                                <property name="receives-default">True</property>
+                                <property name="tooltip-text" translatable="yes">Save the entered name</property>
+                                <property name="margin-start">6</property>
+                                <property name="image">save-icon</property>
+                                <property name="relief">none</property>
+                                <signal name="clicked" handler="on_rename_button_clicked" swapped="no"/>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
                           </object>
                           <packing>
                             <property name="expand">True</property>
@@ -620,14 +452,14 @@ Don't hold down any keys while the injection starts.</property>
                   <object class="GtkBox" id="gamepad_config">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="border-width">20</property>
+                    <property name="border-width">18</property>
                     <property name="orientation">vertical</property>
-                    <property name="spacing">10</property>
+                    <property name="spacing">6</property>
                     <child>
                       <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="spacing">10</property>
+                        <property name="spacing">6</property>
                         <child>
                           <object class="GtkLabel">
                             <property name="visible">True</property>
@@ -671,7 +503,7 @@ Don't hold down any keys while the injection starts.</property>
                       <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="spacing">10</property>
+                        <property name="spacing">6</property>
                         <child>
                           <object class="GtkLabel">
                             <property name="visible">True</property>
@@ -715,7 +547,7 @@ Don't hold down any keys while the injection starts.</property>
                       <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="spacing">10</property>
+                        <property name="spacing">6</property>
                         <child>
                           <object class="GtkLabel">
                             <property name="visible">True</property>
@@ -738,6 +570,7 @@ Don't hold down any keys while the injection starts.</property>
                             <property name="adjustment">mouse_speed_adjustment</property>
                             <property name="round-digits">1</property>
                             <property name="draw-value">False</property>
+                            <signal name="drag-end" handler="save_preset" swapped="no"/>
                             <signal name="value-changed" handler="on_joystick_mouse_speed_changed" swapped="no"/>
                           </object>
                           <packing>
@@ -783,8 +616,8 @@ Don't hold down any keys while the injection starts.</property>
                         <child>
                           <object class="GtkImage" id="warning_status_icon">
                             <property name="can-focus">False</property>
-                            <property name="margin-left">10</property>
-                            <property name="margin-start">10</property>
+                            <property name="margin-left">6</property>
+                            <property name="margin-start">6</property>
                             <property name="icon-name">dialog-warning</property>
                           </object>
                           <packing>
@@ -796,7 +629,7 @@ Don't hold down any keys while the injection starts.</property>
                         <child>
                           <object class="GtkImage" id="error_status_icon">
                             <property name="can-focus">False</property>
-                            <property name="margin-start">10</property>
+                            <property name="margin-start">6</property>
                             <property name="icon-name">dialog-error</property>
                           </object>
                           <packing>
@@ -872,7 +705,7 @@ Don't hold down any keys while the injection starts.</property>
                         <property name="width-request">140</property>
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="tooltip-text" translatable="yes">Click on a cell below and hit a key on your device. Click the "Restore Defaults" beforehand.</property>
+                        <property name="tooltip-text" translatable="yes">Click on a cell below and hit a key on your device. Click the "Restore Defaults" button beforehand.</property>
                         <property name="margin-top">5</property>
                         <property name="margin-bottom">5</property>
                         <property name="label" translatable="yes">Key</property>
@@ -887,29 +720,6 @@ Don't hold down any keys while the injection starts.</property>
                       <object class="GtkLabel">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="tooltip-text" translatable="yes">"disable" disables the key outside of combinations.
-Useful for turning a key into a modifier without any side effects.
-
-You can combine buttons by joining them with " + ":
-- control_l + a
-- alt_l + shift_l + i
-
-Macro examples:
-- k(a)
-- r(3, k(a).w(500))
-- h(k(a)).k(b)
-- m(Control_L, k(a).k(x))
-
-Macro help:
-- r: repeats the execution of the second parameter
-- w: waits in milliseconds
-- k: writes a single keystroke
-- m: holds a modifier while executing the second parameter
-- h: executes the parameter as long as the key is pressed down
-
-Between calls to k, key down and key up events, macros
-will sleep for 10ms by default. This can be configured in
-~/.config/key-mapper/config</property>
                         <property name="margin-top">5</property>
                         <property name="margin-bottom">5</property>
                         <property name="label" translatable="yes">Mapping</property>
@@ -993,5 +803,895 @@ will sleep for 10ms by default. This can be configured in
         </child>
       </object>
     </child>
+  </object>
+  <object class="GtkWindow" id="about-dialog">
+    <property name="can-focus">False</property>
+    <property name="modal">True</property>
+    <property name="icon">key-mapper.svg</property>
+    <property name="type-hint">dialog</property>
+    <property name="urgency-hint">True</property>
+    <property name="transient-for">window</property>
+    <property name="attached-to">window</property>
+    <signal name="key-press-event" handler="on_about_key_press" swapped="no"/>
+    <child>
+      <object class="GtkStack" id="stack1">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="valign">center</property>
+            <property name="margin-top">18</property>
+            <property name="margin-bottom">18</property>
+            <property name="orientation">vertical</property>
+            <property name="spacing">18</property>
+            <child>
+              <object class="GtkImage">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="pixbuf">key-mapper-128.png</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="version-label">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="label" translatable="yes">Version unknown</property>
+                <property name="justify">center</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="about-label1">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="margin-left">6</property>
+                <property name="margin-right">6</property>
+                <property name="margin-start">6</property>
+                <property name="margin-end">6</property>
+                <property name="label" translatable="yes">You can find more information and report bugs at
+&lt;a href="https://github.com/sezanzeb/key-mapper"&gt;https://github.com/sezanzeb/key-mapper&lt;/a&gt;</property>
+                <property name="use-markup">True</property>
+                <property name="justify">center</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="about-label">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="opacity">0.5</property>
+                <property name="margin-left">6</property>
+                <property name="margin-right">6</property>
+                <property name="margin-start">6</property>
+                <property name="margin-end">6</property>
+                <property name="label" translatable="yes">© 2021 Sezanzeb proxima@sezanzeb.de
+This program comes with absolutely no warranty.
+See the &lt;a href="https://www.gnu.org/licenses/gpl-3.0.html"&gt;GNU General Public License, version 3 or later&lt;/a&gt; for details.</property>
+                <property name="use-markup">True</property>
+                <property name="justify">center</property>
+                <style>
+                  <class name="copyright"/>
+                </style>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">3</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="name">About</property>
+            <property name="title" translatable="yes">About</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkScrolledWindow">
+            <property name="width-request">500</property>
+            <property name="height-request">300</property>
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <child>
+              <object class="GtkViewport">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="margin-left">5</property>
+                    <property name="margin-right">5</property>
+                    <property name="margin-start">5</property>
+                    <property name="margin-end">5</property>
+                    <property name="border-width">6</property>
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">6</property>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">A "key + key + ... + key" syntax can be used to trigger key combinations. For example "control_l + a".
+
+"disable" disables a key.</property>
+                        <property name="wrap">True</property>
+                        <property name="xalign">0</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="secondary_error_label7">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="halign">center</property>
+                        <property name="margin-left">6</property>
+                        <property name="margin-right">6</property>
+                        <property name="margin-start">6</property>
+                        <property name="margin-end">6</property>
+                        <property name="ypad">6</property>
+                        <property name="label" translatable="yes">Macros</property>
+                        <property name="use-markup">True</property>
+                        <property name="wrap">True</property>
+                        <property name="xalign">0</property>
+                        <property name="yalign">0.5</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">Macros allow multiple characters to be written with a single key-press.</property>
+                        <property name="wrap">True</property>
+                        <property name="xalign">0</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <!-- n-columns=2 n-rows=9 -->
+                      <object class="GtkGrid">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="column-spacing">18</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">r</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">0</property>
+                            <property name="top-attach">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">waits in milliseconds</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">1</property>
+                            <property name="top-attach">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">w</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">0</property>
+                            <property name="top-attach">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">k</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">0</property>
+                            <property name="top-attach">2</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">writes a single keystroke</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">1</property>
+                            <property name="top-attach">2</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">e</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">0</property>
+                            <property name="top-attach">3</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">holds a modifier while executing the second parameter</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">1</property>
+                            <property name="top-attach">4</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">writes an event</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">1</property>
+                            <property name="top-attach">3</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">m</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">0</property>
+                            <property name="top-attach">4</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">repeats the execution of the second parameter</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">1</property>
+                            <property name="top-attach">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">executes the parameter as long as the key is pressed down</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">1</property>
+                            <property name="top-attach">5</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">h</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">0</property>
+                            <property name="top-attach">5</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">.</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">0</property>
+                            <property name="top-attach">6</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">executes two actions behind each other</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">1</property>
+                            <property name="top-attach">6</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">mouse</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">0</property>
+                            <property name="top-attach">7</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">wheel</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">0</property>
+                            <property name="top-attach">8</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">takes direction (up, left, ...) and speed as parameters</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">1</property>
+                            <property name="top-attach">7</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">same as mouse</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">1</property>
+                            <property name="top-attach">8</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">3</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="secondary_error_label8">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="halign">center</property>
+                        <property name="margin-left">6</property>
+                        <property name="margin-right">6</property>
+                        <property name="margin-start">6</property>
+                        <property name="margin-end">6</property>
+                        <property name="ypad">6</property>
+                        <property name="label" translatable="yes">Examples</property>
+                        <property name="use-markup">True</property>
+                        <property name="wrap">True</property>
+                        <property name="xalign">0</property>
+                        <property name="yalign">0.5</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">4</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <!-- n-columns=2 n-rows=7 -->
+                      <object class="GtkGrid">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="column-spacing">18</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">k(1).k(2)</property>
+                            <property name="selectable">True</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">0</property>
+                            <property name="top-attach">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">a, a, a with 500ms pause</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">1</property>
+                            <property name="top-attach">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">r(3, k(a).w(500))</property>
+                            <property name="selectable">True</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">0</property>
+                            <property name="top-attach">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">m(Control_L, k(a).k(x))</property>
+                            <property name="selectable">True</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">0</property>
+                            <property name="top-attach">2</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">CTRL + a, CTRL + x</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">1</property>
+                            <property name="top-attach">2</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">k(1).h(k(2)).k(3)</property>
+                            <property name="selectable">True</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">0</property>
+                            <property name="top-attach">3</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">moves the mouse cursor 10px to the right</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">1</property>
+                            <property name="top-attach">4</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">writes 1 2 2 ... 2 2 3 while the key is pressed</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">1</property>
+                            <property name="top-attach">3</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">e(EV_REL, REL_X, 10)</property>
+                            <property name="selectable">True</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">0</property>
+                            <property name="top-attach">4</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">1, 2</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">1</property>
+                            <property name="top-attach">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">which keeps moving the mouse while pressed</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">1</property>
+                            <property name="top-attach">5</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">mouse(right, 4)</property>
+                            <property name="selectable">True</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">0</property>
+                            <property name="top-attach">5</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">wheel(down, 1)</property>
+                            <property name="selectable">True</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">0</property>
+                            <property name="top-attach">6</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">keeps scrolling down while held</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">1</property>
+                            <property name="top-attach">6</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">5</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="secondary_error_label9">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="margin-right">6</property>
+                        <property name="margin-end">6</property>
+                        <property name="ypad">6</property>
+                        <property name="label" translatable="yes">Between calls to k, key down and key up events, macros will sleep for 10ms by default, which can be configured in ~/.config/key-mapper/config</property>
+                        <property name="use-markup">True</property>
+                        <property name="wrap">True</property>
+                        <property name="xalign">0</property>
+                        <property name="yalign">0.5</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">6</property>
+                      </packing>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="name">Usage</property>
+            <property name="title" translatable="yes">Usage</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <child type="titlebar">
+      <object class="GtkHeaderBar">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="show-close-button">True</property>
+        <child type="title">
+          <object class="GtkStackSwitcher">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="stack">stack1</property>
+          </object>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkDialog" id="confirm-delete">
+    <property name="can-focus">False</property>
+    <property name="border-width">4</property>
+    <property name="title" translatable="yes">Key Mapper</property>
+    <property name="modal">True</property>
+    <property name="icon">key-mapper.svg</property>
+    <property name="type-hint">dialog</property>
+    <property name="urgency-hint">True</property>
+    <property name="transient-for">window</property>
+    <property name="attached-to">window</property>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="orientation">vertical</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="halign">end</property>
+            <property name="margin-top">6</property>
+            <property name="layout-style">end</property>
+            <child>
+              <object class="GtkButton" id="go_ahead1">
+                <property name="label" translatable="yes">Go Back</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="go_back1">
+                <property name="label">Delete</property>
+                <property name="use-action-appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="can-default">True</property>
+                <property name="receives-default">False</property>
+                <property name="image">gtk-delete-icon1</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="pack-type">end</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <child>
+              <object class="GtkImage" id="error-image2">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="margin-right">6</property>
+                <property name="margin-end">6</property>
+                <property name="yalign">0</property>
+                <property name="icon-name">dialog-warning</property>
+                <property name="icon_size">6</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="confirm-delete-label">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="margin-left">6</property>
+                <property name="margin-right">6</property>
+                <property name="margin-start">6</property>
+                <property name="margin-end">6</property>
+                <property name="ypad">6</property>
+                <property name="use-markup">True</property>
+                <property name="xalign">0</property>
+                <property name="yalign">0.5</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <action-widgets>
+      <action-widget response="-6">go_ahead1</action-widget>
+      <action-widget response="-3">go_back1</action-widget>
+    </action-widgets>
+  </object>
+  <object class="GtkDialog" id="error_dialog">
+    <property name="can-focus">False</property>
+    <property name="border-width">4</property>
+    <property name="title" translatable="yes">Key Mapper</property>
+    <property name="modal">True</property>
+    <property name="icon">key-mapper.svg</property>
+    <property name="type-hint">dialog</property>
+    <property name="urgency-hint">True</property>
+    <property name="transient-for">window</property>
+    <property name="attached-to">window</property>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="orientation">vertical</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="halign">center</property>
+            <property name="margin-top">6</property>
+            <property name="layout-style">end</property>
+            <child>
+              <object class="GtkButton" id="close_error_dialog">
+                <property name="label">gtk-close</property>
+                <property name="use-action-appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="can-default">True</property>
+                <property name="receives-default">False</property>
+                <property name="use-stock">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="pack-type">end</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <child>
+              <object class="GtkImage" id="error-image">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="margin-end">6</property>
+                <property name="yalign">0</property>
+                <property name="icon-name">dialog-error</property>
+                <property name="icon_size">6</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="margin-end">6</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkLabel" id="primary_error_label">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="ypad">6</property>
+                    <property name="use-markup">True</property>
+                    <property name="xalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="secondary_error_label">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="ypad">6</property>
+                    <property name="use-markup">True</property>
+                    <property name="xalign">0</property>
+                    <property name="yalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <action-widgets>
+      <action-widget response="-7">close_error_dialog</action-widget>
+    </action-widgets>
   </object>
 </interface>

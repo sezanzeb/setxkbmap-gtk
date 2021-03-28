@@ -3,7 +3,7 @@
 To open the UI to modify the mappings, look into your applications menu
 and search for 'Key Mapper'. You should be prompted for your sudo password
 as special permissions are needed to read events from `/dev/input/` files.
-You can also start it via `sudo key-mapper-gtk`.
+You can also start it via `key-mapper-gtk`.
 
 <p align="center">
   <img src="usage_1.png"/>
@@ -14,8 +14,7 @@ Hitting a key on the device that is selected in the large dropdown on the top
 should display the key on the bottom of the window, and write it into the selected
 row (as shown in the screenshots).
 
-For changes to take effect, save the preset first. Otherwise, the daemon
-won't be able to know about your changes. Afterwards press the "Apply" button.
+Changes are saved automatically. Afterwards press the "Apply" button.
 
 To change the mapping, you need to use the "Restore Defaults" button, so that
 the application can read the original keycode. It would otherwise be
@@ -23,17 +22,14 @@ invisible since the daemon maps it independently of the GUI.
 
 ## Troubleshooting
 
-If stuff doesn't work, check the output of `sudo key-mapper-gtk -d` and feel free
+If stuff doesn't work, check the output of `key-mapper-gtk -d` and feel free
 to [open up an issue here](https://github.com/sezanzeb/key-mapper/issues/new).
 Make sure to not post any debug logs that were generated while you entered
 private information with your device. Debug logs are quite verbose.
 
-If injecting stops after closing the window, the service is not running.
-Try `sudo systemctl start key-mapper` in a terminal.
-
 If key-mapper or your presets prevents your input device from working
-at all due to autoload, please try to replug your device, wait 3 seconds
-and replug it again. No injection should be running anymore.
+at all due to autoload, please try to unplug and plug it in twice.
+No injection should be running anymore.
 
 ## Combinations
 
@@ -73,18 +69,24 @@ names can be chained using ` + `.
 ## Macros
 
 It is possible to write timed macros into the center column:
+- `r` repeats the execution of the second parameter
+- `w` waits in milliseconds
+- `k` writes a single keystroke
+- `e` writes an event
+- `m` holds a modifier while executing the second parameter
+- `h` executes the parameter as long as the key is pressed down
+- `.` executes two actions behind each other
+- `mouse` and `wheel` take a direction like "up" and speed as parameters
+
+Examples:
 - `k(1).k(2)` 1, 2
 - `r(3, k(a).w(500))` a, a, a with 500ms pause
 - `m(Control_L, k(a).k(x))` CTRL + a, CTRL + x
 - `k(1).h(k(2)).k(3)` writes 1 2 2 ... 2 2 3 while the key is pressed
-
-Documentation:
-- `r` repeats the execution of the second parameter
-- `w` waits in milliseconds
-- `k` writes a single keystroke
-- `m` holds a modifier while executing the second parameter
-- `h` executes the parameter as long as the key is pressed down
-- `.` executes two actions behind each other
+- `e(EV_REL, REL_X, 10)` moves the mouse cursor 10px to the right
+- `mouse(right, 4)` which keeps moving the mouse while pressed.
+  Made out of `h(e(...))` internally
+- `wheel(down, 1)` keeps scrolling down while held
 
 Syntax errors are shown in the UI on save. Each `k` function adds a short
 delay of 10ms between key-down, key-up and at the end. See
@@ -94,7 +96,6 @@ Bear in mind that anti-cheat software might detect macros in games.
 
 ## UI Shortcuts
 
-- Hold down `ctrl` and click on "new" to copy the current preset
 - `shift` + `del` stops the injection (only works while the gui is in focus)
 - `ctrl` + `q` closes the application
 
@@ -140,7 +141,7 @@ configuration files.
 ## Configuration Files
 
 The default configuration is stored at `~/.config/key-mapper/config.json`.
-The current default configuration as of 0.7.1 looks like, with
+The current default configuration as of 0.8.0 looks like, with
 an example autoload entry:
 
 ```json
@@ -208,6 +209,7 @@ running (or without sudo if your user has the appropriate permissions).
 Examples:
 
 ```bash
+key-mapper-control --version
 key-mapper-control --command autoload
 # if you are running as root user, provide information about the whereabouts of the key-mapper config:
 key-mapper-control --command autoload --config-dir "/home/user/.config/key-mapper/"

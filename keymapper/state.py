@@ -71,6 +71,7 @@ class SystemMapping:
     def __init__(self):
         """Construct the system_mapping."""
         self._mapping = {}  # str to int
+        self.xmodmap = {}
         self._allocated_unknowns = {}  # int to str  # TODO test
 
         # this may contain more entries than _mapping, since _mapping
@@ -99,6 +100,10 @@ class SystemMapping:
             for keycode in xmodmap_dict.values():
                 self._occupied_keycodes.add(keycode)
 
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            # might be within a tty
+            pass
+
             if USER != 'root':
                 # write this stuff into the key-mapper config directory,
                 # because the systemd service won't know the user sessions
@@ -122,6 +127,8 @@ class SystemMapping:
             if name.startswith('KEY') or name.startswith('BTN'):
                 self._set(name, ecode)
 
+        # TODO do this in row.py and not clutter the system_mapping?
+        #  isn't the disable code completely pointless?
         self._set(DISABLE_NAME, DISABLE_CODE)
 
     def update(self, mapping):
@@ -205,6 +212,14 @@ class SystemMapping:
         """
         # TODO test
         return self._allocated_unknowns
+
+    def get_name(self, code):
+        """Get the first matching name for the code."""
+        for entry in self.xmodmap:
+            if int(entry[0]) - XKB_KEYCODE_OFFSET == code:
+                return entry[1].split()[0]
+
+        return None
 
 
 # one mapping object for the GUI application

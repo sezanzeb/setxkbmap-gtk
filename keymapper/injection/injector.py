@@ -30,8 +30,7 @@ import evdev
 from evdev.ecodes import EV_KEY, EV_REL
 
 from keymapper.logger import logger
-from keymapper.getdevices import get_devices, is_gamepad, \
-    get_mapping_device_name
+from keymapper.getdevices import get_devices, classify, GAMEPAD
 from keymapper import utils
 from keymapper.mapping import DISABLE_CODE
 from keymapper.injection.keycode_mapper import KeycodeMapper
@@ -167,7 +166,7 @@ class Injector(multiprocessing.Process):
                 needed = True
                 break
 
-        gamepad = is_gamepad(device)
+        gamepad = classify(device) == GAMEPAD
 
         if gamepad and self.context.maps_joystick():
             logger.debug('Grabbing "%s" because of maps_joystick', path)
@@ -259,7 +258,13 @@ class Injector(multiprocessing.Process):
 
         # and all keycodes that are injected by macros
         for macro in self.context.macros.values():
-            capabilities[EV_KEY] += list(macro.get_capabilities())
+            macro_capabilities = macro.get_capabilities()
+            for ev_type in macro_capabilities:
+                if len(macro_capabilities[ev_type]) == 0:
+                    continue
+                if ev_type not in capabilities:
+                    capabilities[ev_type] = []
+                capabilities[ev_type] += list(macro_capabilities[ev_type])
 
         if gamepad and self.context.joystick_as_mouse():
             # REL_WHEEL was also required to recognize the gamepad
@@ -300,6 +305,14 @@ class Injector(multiprocessing.Process):
                 loop.stop()
                 return
 
+    def get_udef_name(self, name, suffix):
+        """Make sure the generated name is not longer than 80 chars."""
+        max_len = 80  # based on error messages
+        remaining_len = max_len - len(DEV_NAME) - len(suffix) - 2
+        middle = name[:remaining_len]
+        name = f'{DEV_NAME} {middle} {suffix}'
+        return name
+
     def run(self):
         """The injection worker that keeps injecting until terminated.
 
@@ -336,9 +349,9 @@ class Injector(multiprocessing.Process):
         # where mapped events go to.
         # See the Context docstring on why this is needed.
         self.context.uinput = evdev.UInput(
-            name=get_mapping_device_name(self.device),
+            name=self.get_udef_name(self.device, 'mapped'),
             phys=DEV_NAME,
-            events=self._construct_capabilities(group['gamepad'])
+            events=self._construct_capabilities(group['type'] == 'gamepad')
         )
 
         generate_xkb_config(self.context, self.device)  # TODO test
@@ -354,9 +367,9 @@ class Injector(multiprocessing.Process):
             # certain capabilities can have side effects apparently. with an
             # EV_ABS capability, EV_REL won't move the mouse pointer anymore.
             # so don't merge all InputDevices into one UInput device.
-            gamepad = is_gamepad(source)
+            gamepad = classify(source) == GAMEPAD
             forward_to = evdev.UInput(
-                name=f'{DEV_NAME} {source.name} forwarded',
+                name=self.get_udef_name(source.name, 'forwarded'),
                 phys=DEV_NAME,
                 events=self._copy_capabilities(source)
             )
@@ -422,7 +435,7 @@ class Injector(multiprocessing.Process):
             source.path, source.fd
         )
 
-        gamepad = is_gamepad(source)
+        gamepad = classify(source) == GAMEPAD
 
         keycode_handler = KeycodeMapper(self.context, source, forward_to)
 
