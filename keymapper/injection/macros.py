@@ -260,7 +260,6 @@ class _Macro:
 
     def keycode(self, character):
         """Write the character."""
-        character = str(character)
         code = system_mapping.get_or_allocate(character)  # TODO test
         if code is None:
             raise KeyError(f'Could not map unknown key "{character}"')

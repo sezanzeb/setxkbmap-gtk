@@ -528,8 +528,8 @@ class TestInjector(unittest.TestCase):
         custom_mapping.change(combination, 'k(KEY_Q).k(w)')
         custom_mapping.change(Key(EV_ABS, ABS_HAT0X, -1), 'a')
         # one mapping that is unknown in the system_mapping on purpose
-        input_b = 10
-        custom_mapping.change(Key(EV_KEY, input_b, 1), 'b')
+        input_garbage = 10
+        custom_mapping.change(Key(EV_KEY, input_garbage, 1), 'abcdefg')
 
         # stuff the custom_mapping outputs (except for the unknown b)
         system_mapping.clear()
@@ -611,8 +611,8 @@ class TestInjector(unittest.TestCase):
         # Injected keycodes should always be either 0 or 1
         self.assertEqual(history[2], (EV_KEY, code_a, 1))
         self.assertEqual(history[3], (EV_KEY, code_a, 0))
-        self.assertEqual(history[4], (EV_KEY, input_b, 1))
-        self.assertEqual(history[5], (EV_KEY, input_b, 0))
+        self.assertEqual(history[4], (EV_KEY, input_garbage, 1))
+        self.assertEqual(history[5], (EV_KEY, input_garbage, 0))
         self.assertEqual(history[6], (3124, 3564, 6542))
 
         time.sleep(0.1)

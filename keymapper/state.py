@@ -29,6 +29,7 @@ import evdev
 from keymapper.logger import logger
 from keymapper.mapping import Mapping, DISABLE_NAME, DISABLE_CODE
 from keymapper.paths import get_config_path, touch, USER
+from keymapper.injection.valid_symbols import VALID_XKB_SYMBOLS
 
 
 # xkb uses keycodes that are 8 higher than those from evdev
@@ -81,7 +82,6 @@ class SystemMapping:
         self._mapping = {}  # str to int
         self._xmodmap_dict = {}  # str to int
         self._allocated_unknowns = {}  # int to str  # TODO test
-        self.known_xkb_keys = []
 
         # this may contain more entries than _mapping, since _mapping
         # stores only one code per character, but a keyboard layout can
@@ -176,6 +176,9 @@ class SystemMapping:
             For example F24 or odiaeresis
         """
         # TODO test
+        if character is None:
+            return None
+
         character = str(character).lower()
 
         if character in self._mapping:
@@ -185,7 +188,7 @@ class SystemMapping:
         # it's unknown, allocate instead
         # TODO test if it is known to xkb at all
         #  generate a list from the contents of the xkb dir?
-        if character not in self.known_xkb_keys:
+        if character not in VALID_XKB_SYMBOLS:
             # not something xkb can do stuff with
             return None
 
