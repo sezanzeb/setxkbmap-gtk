@@ -142,6 +142,7 @@ def should_map_as_btn(event, mapping, gamepad):
         return False
 
     if event.type == EV_ABS:
+        # TODO separate function
         if event.code == evdev.ecodes.ABS_MISC:
             # what is that even supposed to be.
             # the intuos 5 spams those with every event
@@ -165,6 +166,7 @@ def should_map_as_btn(event, mapping, gamepad):
             return True
 
     if event.type == EV_REL:
+        # TODO separate function
         if is_wheel(event):
             return True
 

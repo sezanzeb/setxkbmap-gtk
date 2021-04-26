@@ -152,6 +152,8 @@ class Key:
         Only the last key remains the same in the returned result.
         """
         # TODO test
+        # TODO put permutating mouse-movement combinations into a separate
+        #  method
         for key in self.keys:
             if key[:2] in ((EV_REL, REL_X), (EV_REL, REL_Y)):
                 contains_mouse_movement = True
@@ -159,15 +161,16 @@ class Key:
         else:
             contains_mouse_movement = False
 
+        if contains_mouse_movement:
+            # it feels much more natural if it doesn't matter if the mouse
+            # is moved first or if the key is pressed beforehand.
+            return [
+                Key(*permutation) for permutation
+                in itertools.permutations(self.keys)
+            ]
+
         permutations = []
+        for permutation in itertools.permutations(self.keys[:-1]):
+            permutations.append(Key(*permutation, self.keys[-1]))
+        return permutations
 
-        if not contains_mouse_movement:
-            for permutation in itertools.permutations(self.keys[:-1]):
-                permutations.append(Key(*permutation, self.keys[-1]))
-
-            return permutations
-
-        return [
-            Key(*permutation) for permutation
-            in itertools.permutations(self.keys)
-        ]
