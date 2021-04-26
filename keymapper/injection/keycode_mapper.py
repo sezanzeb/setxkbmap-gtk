@@ -383,6 +383,7 @@ class KeycodeMapper:
                 else:
                     logger.key_spam(key, 'not forwarding release')
             elif event.type != EV_ABS:
+                # TODO don't spam mouse movement logs
                 # ABS events might be spammed like crazy every time the
                 # position slightly changes
                 if not is_mapped and forward:
