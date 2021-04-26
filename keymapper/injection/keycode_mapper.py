@@ -385,7 +385,12 @@ class KeycodeMapper:
             elif event.type != EV_ABS:
                 # ABS events might be spammed like crazy every time the
                 # position slightly changes
-                logger.key_spam(key, 'unexpected key up')
+                if not is_mapped and forward:
+                    # forward the release event
+                    logger.key_spam((original_tuple,), 'forwarding unexpected key up')
+                    self.forward(original_tuple)
+                else:
+                    logger.key_spam(key, 'unexpected key up')
 
             # everything that can be released is released now
             return

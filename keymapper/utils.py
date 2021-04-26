@@ -26,7 +26,7 @@ import math
 
 import evdev
 from evdev.ecodes import EV_KEY, EV_ABS, ABS_X, ABS_Y, ABS_RX, ABS_RY, \
-    EV_REL, REL_WHEEL, REL_HWHEEL
+    EV_REL, REL_WHEEL, REL_HWHEEL, REL_X, REL_Y
 
 from keymapper.logger import logger
 from keymapper.config import BUTTONS
@@ -90,6 +90,14 @@ def normalize_value(event, abs_range=None):
     # non-joystick abs events (triggers) usually start at 0 and go up to 255,
     # but anything that is > 0 was safe to be treated as pressed so far
 
+    if event.type == EV_REL and event.code in [REL_X, REL_Y]:
+        # mouse movements are only interesting if it is moved fast enough
+        movement_threshold = 0
+        if abs(event.value) <= movement_threshold:
+            return 0
+
+        return sign(event.value)
+
     return sign(event.value)
 
 
@@ -100,14 +108,18 @@ def is_wheel(event):
 
 def will_report_key_up(event):
     """Check if the key is expected to report a down event as well."""
-    return not is_wheel(event)
+    if event.type == EV_REL and event.code in [REL_X, REL_Y]:
+        # TODO test
+        return False
+
+    if is_wheel(event):
+        return False
+
+    return True
 
 
 def should_map_as_btn(event, mapping, gamepad):
     """Does this event describe a button.
-
-    If it does, this function will make sure its value is one of [-1, 0, 1],
-    so that it matches the possible values in a mapping object if needed.
 
     If a new kind of event should be mappable to buttons, this is the place
     to add it.
@@ -152,8 +164,14 @@ def should_map_as_btn(event, mapping, gamepad):
             # buttons
             return True
 
-    if is_wheel(event):
-        return True
+    if event.type == EV_REL:
+        if is_wheel(event):
+            return True
+
+        if event.code in [REL_X, REL_Y]:
+            purpose = mapping.get('mouse.movement.purpose')
+            if purpose == BUTTONS:
+                return True
 
     if event.type == EV_KEY:
         # usually all EV_KEY events are allright, except for

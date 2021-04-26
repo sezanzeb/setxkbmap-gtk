@@ -189,6 +189,8 @@ class Window:
         # height that doesn't jump when a gamepad is selected
         self.get('gamepad_separator').hide()
         self.get('gamepad_config').hide()
+        self.get('mouse_separator').hide()
+        self.get('mouse_config').hide()
 
         self.populate_devices()
 
@@ -298,6 +300,24 @@ class Window:
             value = custom_mapping.get('gamepad.joystick.pointer_speed')
             range_value = math.log(value, 2)
             speed.set_value(range_value)
+
+    def initialize_mouse_config(self):
+        """Set slider and dropdown values when a mouse is selected."""
+        # TODO test
+        # TODO test that by default "mouse" is selected (NONE)
+        if MOUSE in self.group.types:
+            self.get('mouse_separator').show()
+            self.get('mouse_config').show()
+        else:
+            self.get('mouse_separator').hide()
+            self.get('mouse_config').hide()
+            return
+
+        purpose = self.get('mouse_movement_purpose')
+
+        with HandlerDisabled(purpose, self.on_mouse_movement_purpose_changed):
+            value = custom_mapping.get('mouse.movement.purpose')
+            purpose.set_active_id(value)
 
     def get(self, name):
         """Get a widget from the window"""
@@ -798,6 +818,7 @@ class Window:
         self.add_empty()
 
         self.initialize_gamepad_config()
+        self.initialize_mouse_config()  # TODO test
 
         custom_mapping.changed = False
 
@@ -817,6 +838,12 @@ class Window:
         """Set how fast the joystick moves the mouse."""
         speed = 2 ** gtk_range.get_value()
         custom_mapping.set('gamepad.joystick.pointer_speed', speed)
+
+    def on_mouse_movement_purpose_changed(self, dropdown):
+        """Set the purpose of mouse movements."""
+        purpose = dropdown.get_active_id()
+        custom_mapping.set('mouse.movement.purpose', purpose)
+        self.save_preset()
 
     def add_empty(self):
         """Add one empty row for a single mapped key."""

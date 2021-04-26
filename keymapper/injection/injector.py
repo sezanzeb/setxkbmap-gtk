@@ -440,6 +440,10 @@ class Injector(multiprocessing.Process):
 
         keycode_handler = KeycodeMapper(self.context, source, forward_to)
 
+        # TODO test that mouse movements are forwarded in buttons mode
+        #   if not mapped (including if mapped as combination but it's not
+        #   triggered)
+
         async for event in source.async_read_loop():
             if self._event_producer.is_handled(event):
                 # the event_producer will take care of it

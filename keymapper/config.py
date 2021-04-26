@@ -42,6 +42,11 @@ INITIAL_CONFIG = {
         # detected properly in software.
         'keystroke_sleep_ms': 10
     },
+    'mouse': {
+        'movement': {
+            'purpose': NONE
+        }
+    },
     'gamepad': {
         'joystick': {
             # very small movements of the joystick should result in very

@@ -154,6 +154,11 @@ looks like, with  an example autoload entry:
     "macros": {
         "keystroke_sleep_ms": 10
     },
+    "mouse": {
+      "movement": {
+        "purpose": "none"
+      }
+    },
     "gamepad": {
         "joystick": {
             "non_linearity": 4,
