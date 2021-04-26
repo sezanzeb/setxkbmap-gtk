@@ -386,6 +386,7 @@ class KeycodeMapper:
                 # ABS events might be spammed like crazy every time the
                 # position slightly changes
                 if not is_mapped and forward:
+                    # TODO test
                     # forward the release event
                     logger.key_spam((original_tuple,), 'forwarding unexpected key up')
                     self.forward(original_tuple)
