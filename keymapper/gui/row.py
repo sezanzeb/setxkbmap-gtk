@@ -117,6 +117,11 @@ def to_string(key):
             (evdev.ecodes.REL_WHEEL, 1): 'Up',
             (evdev.ecodes.REL_HWHEEL, -1): 'Left',
             (evdev.ecodes.REL_HWHEEL, 1): 'Right',
+            # mouse movements
+            (evdev.ecodes.REL_Y, -1): 'Up',
+            (evdev.ecodes.REL_Y, 1): 'Down',
+            (evdev.ecodes.REL_X, -1): 'Left',
+            (evdev.ecodes.REL_X, 1): 'Right',
         }.get((code, value))
         if direction is not None:
             key_name += f' {direction}'
@@ -139,6 +144,8 @@ def to_string(key):
     key_name = key_name.replace('BTN_', 'Button ')
     key_name = key_name.replace('KEY_', '')
 
+    key_name = key_name.replace('REL_X', 'Move')
+    key_name = key_name.replace('REL_Y', 'Move')
     key_name = key_name.replace('REL_', '')
     key_name = key_name.replace('HWHEEL', 'Wheel')
     key_name = key_name.replace('WHEEL', 'Wheel')
