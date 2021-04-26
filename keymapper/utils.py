@@ -68,7 +68,8 @@ def sign(value):
     return 0
 
 
-def normalize_value(event, abs_range=None):
+# TODO mouse_movement_threshold docstring and test
+def normalize_value(event, abs_range=None, mouse_movement_threshold=1):
     """Fit the event value to one of 0, 1 or -1."""
     if event.type == EV_ABS and event.code in JOYSTICK:
         if abs_range is None:
@@ -91,9 +92,9 @@ def normalize_value(event, abs_range=None):
     # but anything that is > 0 was safe to be treated as pressed so far
 
     if event.type == EV_REL and event.code in [REL_X, REL_Y]:
+        # TODO test
         # mouse movements are only interesting if it is moved fast enough
-        movement_threshold = 1
-        if abs(event.value) <= movement_threshold:
+        if abs(event.value) <= mouse_movement_threshold:
             return 0
 
         return sign(event.value)

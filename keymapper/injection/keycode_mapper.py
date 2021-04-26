@@ -341,7 +341,11 @@ class KeycodeMapper:
         # possible, because they might skip the 1 when pressed fast
         # enough.
         original_tuple = (event.type, event.code, event.value)
-        event.value = utils.normalize_value(event, self.abs_range)
+        event.value = utils.normalize_value(
+            event,
+            self.abs_range,
+            mouse_movement_threshold=0
+        )
 
         # the tuple of the actual input event. Used to forward the event if
         # it is not mapped, and to index unreleased and active_macros. stays
