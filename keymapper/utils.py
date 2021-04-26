@@ -92,7 +92,7 @@ def normalize_value(event, abs_range=None):
 
     if event.type == EV_REL and event.code in [REL_X, REL_Y]:
         # mouse movements are only interesting if it is moved fast enough
-        movement_threshold = 0
+        movement_threshold = 1
         if abs(event.value) <= movement_threshold:
             return 0
 

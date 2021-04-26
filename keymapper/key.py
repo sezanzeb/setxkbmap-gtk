@@ -25,6 +25,7 @@
 import itertools
 
 from evdev import ecodes
+from evdev.ecodes import EV_REL, REL_X, REL_Y
 
 
 def verify(key):
@@ -150,11 +151,23 @@ class Key:
         combining a + b + c should have the same result as b + a + c.
         Only the last key remains the same in the returned result.
         """
-        if len(self.keys) <= 2:
-            return [self]
+        # TODO test
+        for key in self.keys:
+            if key[:2] in ((EV_REL, REL_X), (EV_REL, REL_Y)):
+                contains_mouse_movement = True
+                break
+        else:
+            contains_mouse_movement = False
 
         permutations = []
-        for permutation in itertools.permutations(self.keys[:-1]):
-            permutations.append(Key(*permutation, self.keys[-1]))
 
-        return permutations
+        if not contains_mouse_movement:
+            for permutation in itertools.permutations(self.keys[:-1]):
+                permutations.append(Key(*permutation, self.keys[-1]))
+
+            return permutations
+
+        return [
+            Key(*permutation) for permutation
+            in itertools.permutations(self.keys)
+        ]
