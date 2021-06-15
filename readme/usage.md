@@ -85,7 +85,17 @@ Examples:
 - Alphanumeric `a` to `z` and `0` to `9`
 - Modifiers `Alt_L` `Control_L` `Control_R` `Shift_L` `Shift_R`
 - Mouse buttons `BTN_LEFT` `BTN_RIGHT` `BTN_MIDDLE` `BTN_SIDE` ...
-- Multimedia keys `KEY_NEXTSONG` `KEY_PLAYPAUSE` ...
+- Mouse scroll `wheel(down, 1)` `wheel(up, 1)`
+- Mouse move `mouse(left, 1)` `mouse(right, 1)` `mouse(up, 1)` `mouse(down, 1)`
+- Multimedia keys `KEY_NEXTSONG` `KEY_PLAYPAUSE` `XF86AudioMicMute` ...
+
+## Keyboard/Mouse cooperation
+
+Left click mapped to a keyboard key can be held while moving the cursor by
+a real mouse/trackball, resulting in proper drag'n'drop.
+
+Mouse scroll up/down mapped to keyboard keys can add scroll support to cheap
+3-button mice and trackballs without a scroll ring.
 
 ## Gamepads
 
@@ -98,6 +108,13 @@ while the joystick turns the view (depending on the game).
 
 Tested with the XBOX 360 Gamepad. On Ubuntu, gamepads worked better in
 Wayland than with X11 for me.
+
+## Foot Pedals
+
+Foot pedal clicks can be translated into mouse scroll events even if the
+device didn't support that. Tested on Kinesis Savant Elite 2 (3-pedal
+version) on Wayland/Ubuntu. Scroll events generated while holding the
+pedal linearly auto-repeat as they should.
 
 <br/>
 <br/>
